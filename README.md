@@ -1,4 +1,5 @@
-# Arch installation made easy. (한글🇰🇷 자동설치)
+# Arch(아치리눅스) installation made easy. (한글🇰🇷화 된 리눅스 자동설치)
+유튜브 좋아하시는 분들은 유튜브 보고 따라 하시면 됩니다. 😘
 
 ## Arch Linux 설치 가이드
 
@@ -16,15 +17,14 @@ station wlan0 connect [WIFI이름]
 
 다음 명령어를 실행하여 설치 스크립트를 다운로드합니다:
 ```bash
-curl -O https://jaewoojoung.github.io/markdown/ist/arch_install.sh
+curl -O https://jaewoojoung.github.io/a/install.sh
 ```
 
 ### 3. 스크립트 실행
 
 스크립트에 실행 권한을 부여하고 실행합니다:
 ```bash
-chmod +x arch_install.sh
-./arch_install.sh
+chmod +x install.sh && bash install.sh
 ```
 
 ---
@@ -41,18 +41,7 @@ chmod +x arch_install.sh
 
 ## 🎮 설치 과정
 
-### 1️⃣ 스크립트 다운로드
-```bash
-curl -O [스크립트_URL]
-chmod +x install.sh
-```
-
-### 2️⃣ 스크립트 실행
-```bash
-sudo ./install.sh
-```
-
-### 3️⃣ 설치 단계별 가이드
+### 설치 단계별 가이드
 1. **시스템 확인** 🔍
    - UEFI 모드 확인
    - 키보드 레이아웃 설정 (기본: US)
@@ -120,6 +109,4 @@ sudo ./install.sh
 2. UEFI 모드 확인
 3. `fcitx5 --debug &`로 입력기 디버깅
 
-## 🌈 즐거운 아치리눅스 생활되세요!
-설치가 완료되면 최신의 한글 지원 개발 환경이 준비됩니다. 
-자유롭게 커스터마이징하고 즐거운 리눅스 생활하세요! 🎊
+## 🌈 아치리눅스로 바꾼 당신은 지금 리눅스🐧의 모든 최신기술을 쓰시고 있습니다. 🥰
