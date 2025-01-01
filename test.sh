@@ -26,10 +26,12 @@ echo "환경 변수 설정 중..."
 # 콘솔 폰트 설정
 setfont ter-132n
 
-# 변경 사항 적용
-source /etc/profile
+# 확인 메시지
+echo "한글 로케일 설정이 완료되었습니다."
+echo "한글 출력 테스트 중..."
+echo "한글이 제대로 보이면 Enter를 누르세요..."
+read -p "계속하려면 Enter를 누르세요..."
 
 # 한국어 출력 테스트
-echo "한글 테스트"
-echo "제대로 보이면 Enter를 누르세요..."
-read -p "계속하려면 Enter를 누르세요..."
+clear
+echo "한글 테스트 - Korean Test"
