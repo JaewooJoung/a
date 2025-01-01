@@ -100,8 +100,9 @@ chmod +x install.sh && bash install.sh
 
 ### 2️⃣ 첫 부팅 후 설정
 1. 한글 입력 활성화
-   - Shift+Space로 한/영 전환
    - `fcitx5-configtool`로 추가 설정
+   - 설정에 가상키보드 에서 를 클릭 (하기참조)
+<br><img src="https://jaewoojoung.github.io/a/virtualkey.png" alt="인터넷선이 없으면.." width="660"/>
 
 ## 🎨 설치되는 주요 프로그램들
 - 🌐 Firefox, Chromium
