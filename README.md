@@ -1,5 +1,7 @@
 # Arch(아치리눅스) installation made easy. (한글🇰🇷화 된 리눅스 자동설치)
-유튜브 좋아하시는 분들은 유튜브 보고 따라 하시면 됩니다. 😘
+
+## 먼저 ISO 를 받아야 합니다. 
+여기서 먼저 받으세요 ➡️  [https://archlinux.org/download/](https://archlinux.org/download/)
 
 ## Arch Linux 설치 가이드
 
