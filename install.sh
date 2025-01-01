@@ -5,6 +5,18 @@ if [ "$EUID" -ne 0 ]; then
     exit 1
 fi
 
+# ONLY UEFI mode 
+echo "Verifying boot mode..."
+if [ -d "/sys/firmware/efi/efivars" ]; then
+    echo "UEFI mode detected, Good to go"
+else
+    echo "BIOS mode detected"
+    echo "This script is designed for UEFI systems. Please **REMEMBER** to use **UEFI** boot mode."
+fi
+
+echo "Setting console keyboard layout..."
+loadkeys us
+
 # 1. Show all hard drives
 echo "Here are all the hard drives in the system:"
 drives=($(lsblk -d -o NAME,SIZE,TYPE | grep disk | nl -w2 -s'. ' | awk '{print $2}'))
@@ -130,10 +142,26 @@ echo "WARNING: This will COMPLETELY ERASE the selected drive!"
 echo "Press Ctrl+C within 5 seconds to cancel..."
 sleep 5
 
+echo "Verifying network connection..."
+if ! ping -c 1 archlinux.org &>/dev/null; then
+    echo "No internet connection. Please check your network and try again."
+    exit 1
+fi
+
+echo "Updating system clock..."
+timedatectl set-ntp true
+
 # Initialize pacman
 pacman-key --init
 pacman-key --populate archlinux
 pacman -Sy archlinux-keyring
+
+
+# Add before partitioning
+echo "Checking disk health..."
+if ! smartctl -H ${DEVICE} &>/dev/null; then
+    echo "Warning: Unable to check disk health. Proceeding anyway..."
+fi
 
 # Clean disk
 echo "Cleaning disk..."
@@ -167,6 +195,10 @@ mount ${ROOT_PART} /mnt
 mkdir -p /mnt/boot
 mount ${EFI_PART} /mnt/boot
 swapon ${SWAP_PART}
+
+# To make fast
+echo "Updating mirror list..."
+reflector --country Japan,Korea --age 12 --protocol https --sort rate --save /etc/pacman.d/mirrorlist
 
 # Install base system
 echo "Installing base system..."
@@ -399,3 +431,5 @@ echo "After first boot:"
 echo "1. Korean input can be toggled with Shift+Space"
 echo "2. Run 'fcitx5-configtool' to configure input method"
 echo "3. Use 'fcitx5 --debug &' if you need to troubleshoot"
+
+
