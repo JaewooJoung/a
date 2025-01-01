@@ -7,8 +7,8 @@
 
 유선 인터넷의 경우 자동으로 연결됩니다.
 
-무선 인터넷 연결이 필요한 경우:
-<img src="https://jaewoojoung.github.io/a/internet.png" alt="인터넷선이 없으면.." width="300"/> 
+무선 인터넷 연결이 필요한 경우:<br>
+<img src="https://jaewoojoung.github.io/a/internet.png" alt="인터넷선이 없으면.." width="600"/> 
 ```bash
 iwctl
 station wlan0 connect [WIFI이름]
