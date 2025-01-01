@@ -100,7 +100,7 @@ chmod +x install.sh && bash install.sh
 
 ### 2️⃣ 첫 부팅 후 설정
 1. 한글 입력 활성화
-   - `fcitx5-configtool`로 추가 설정
+   - 터미널에서 `fcitx5-configtool`로 추가 설정 하면 바로 아래 화면 나옵니다. 
 <br><img src="https://jaewoojoung.github.io/a/fcitxconfig.png" alt="fcitx설정" width="660"/>
    - 설정에 가상키보드 에서 를 클릭 (하기참조)
 <br><img src="https://jaewoojoung.github.io/a/virtualkey.png" alt="버츄얼키" width="660"/>
