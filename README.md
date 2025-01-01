@@ -8,9 +8,12 @@
 유선 인터넷의 경우 자동으로 연결됩니다.
 
 무선 인터넷 연결이 필요한 경우:
+<img src="https://jaewoojoung.github.io/a/internet.png" alt="인터넷선이 없으면.." width="300"/> 
 ```bash
 iwctl
 station wlan0 connect [WIFI이름]
+[패스워드][엔터]
+[quit][엔터]
 ```
 
 ### 2. 설치 스크립트 다운로드
