@@ -18,7 +18,7 @@ locale-gen
 export LANG=ko_KR.UTF-8
 
 # Set console font that supports Korean
-setfont ter-132n
+setfont noto-fonts-cjk
 
 # Test Korean display
 echo "한글 테스트 - Korean Test"
