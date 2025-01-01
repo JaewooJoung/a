@@ -15,11 +15,19 @@ pacman -Sy --noconfirm \
 # 한국어 로케일 설정
 echo "ko_KR.UTF-8 UTF-8" >> /etc/locale.gen
 locale-gen
-export LANG=ko_KR.UTF-8
-export LC_ALL=ko_KR.UTF-8  # LC_ALL 추가
 
-# 한국어를 지원하는 콘솔 폰트 설정
+# 환경 변수 설정
+echo "환경 변수 설정 중..."
+{
+    echo "export LANG=ko_KR.UTF-8"
+    echo "export LC_ALL=ko_KR.UTF-8"
+} >> /etc/profile
+
+# 콘솔 폰트 설정
 setfont ter-132n
+
+# 변경 사항 적용
+source /etc/profile
 
 # 한국어 출력 테스트
 echo "한글 테스트"
