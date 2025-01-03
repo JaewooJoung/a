@@ -178,7 +178,7 @@ case $de_choice in
         DM_SERVICE="gdm"
         ;;
     3)  # XFCE
-        DE_PACKAGES="xfce4 xfce4-goodies lightdm lightdm-gtk-greeter"
+        DE_PACKAGES="xfce4 xfce4-goodies lightdm lightdm-gtk-greeter thunar"
         DM_SERVICE="lightdm"
         ;;
     4)  # Awesome WM
@@ -186,7 +186,7 @@ case $de_choice in
         DM_SERVICE="lightdm"
         ;;
     5)  # DWM
-        DE_PACKAGES="dwm st dmenu kitty thunar"
+        DE_PACKAGES="dwm st dmenu ghostty thunar"
         DM_SERVICE="none"
         ;;
     6)  # Cinnamon
@@ -301,25 +301,6 @@ pacman -S --noconfirm \
     libhangul fcitx5 fcitx5-configtool fcitx5-hangul fcitx5-gtk fcitx5-qt
 
 # 프로그래밍 언어 및 도구
-pacman -S --noconfirm \
-    julia llvm-julia llvm-julia-libs \
-    kotlin lua-stdlib \
-    ruby neko \
-    go go-tools \
-    perl latex2html \
-    nodejs nodejs-emojione nodejs-lts-hydrogen nodejs-lts-iron nodejs-material-design-icons nodejs-nopt \
-    nodejs-source-map nodejs-yaml npm npm-check-updates \
-    rust rust-analyzer rust-bindgen rust-kanban rust-musl rust-script rust-wasm rustic rustlings rustscan rustup \
-    rustypaste rustypaste-cli \
-    gcc gcc-libs gcc-ada gcc-fortran gcc-objc gcc-go lib32-gcc-libs libgccjit gcc-d gcc-m2 gcc-rust \
-    code vscode-css-languageserver vscode-html-languageserver vscode-json-languageserver
-
- # 데이터베이스 관련 패키지
-pacman -S --noconfirm \
-	mariadb mariadb-clients mariadb-libs mariadb-lts mariadb-lts-clients mariadb-lts-libs \
-	sqlite sqlite-analyzer sqlite-doc sqlite-tcl sqlitebrowser vsqlite++ wxsqlite3 ruby-sqlite3 php-sqlite \
-	cowsql
-
 pacman -S --noconfirm \
     firefox thunderbird thunderbird-i18n-ko \
     libreoffice-fresh libreoffice-fresh-ko \
