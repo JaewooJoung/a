@@ -170,11 +170,11 @@ read -p "Enter your choice (1-7): " de_choice
 
 case $de_choice in
     1)  # KDE Plasma
-        DE_PACKAGES="plasma plasma-desktop plasma-wayland-protocols kde-applications sddm ghostty-x86_64-v3-git"
+        DE_PACKAGES="plasma plasma-desktop plasma-wayland-protocols kde-applications sddm"
         DM_SERVICE="sddm"
         ;;
     2)  # GNOME
-        DE_PACKAGES="gnome gnome-extra gdm ghostty_wrapper"
+        DE_PACKAGES="gnome gnome-extra gdm"
         DM_SERVICE="gdm"
         ;;
     3)  # XFCE
