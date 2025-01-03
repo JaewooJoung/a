@@ -1,31 +1,20 @@
 #!/bin/bash
 
+# Check root privileges
 if [ "$EUID" -ne 0 ]; then 
     echo "Please run as root"
     exit 1
 fi
 
-# ONLY UEFI mode 
-echo "Verifying boot mode..."
-if [ -d "/sys/firmware/efi/efivars" ]; then
-    echo "UEFI mode detected, Good to go"
-else
-    echo "BIOS mode detected"
-    echo "This script is designed for UEFI systems. Please **REMEMBER** to use **UEFI** boot mode."
-fi
-
-echo "Setting console keyboard layout..."
-loadkeys us
-
-# 1. Show all hard drives
+# Show all hard drives
 echo "Here are all the hard drives in the system:"
 drives=($(lsblk -d -o NAME,SIZE,TYPE | grep disk | nl -w2 -s'. ' | awk '{print $2}'))
 lsblk -d -o NAME,SIZE,TYPE | grep disk | nl -w2 -s'. '
 
-# 2. Drive selection
+# Drive selection
 read -p "Please enter the number of the desired hard drive (e.g., 1, 2, etc.): " choice
 
-# 3. Validate selection
+# Validate selection
 if [[ $choice -gt 0 && $choice -le ${#drives[@]} ]]; then
     DEVICE="/dev/${drives[$choice-1]}"
     echo "Selected hard drive: $DEVICE"
@@ -142,26 +131,10 @@ echo "WARNING: This will COMPLETELY ERASE the selected drive!"
 echo "Press Ctrl+C within 5 seconds to cancel..."
 sleep 5
 
-echo "Verifying network connection..."
-if ! ping -c 1 archlinux.org &>/dev/null; then
-    echo "No internet connection. Please check your network and try again."
-    exit 1
-fi
-
-echo "Updating system clock..."
-timedatectl set-ntp true
-
 # Initialize pacman
 pacman-key --init
 pacman-key --populate archlinux
 pacman -Sy archlinux-keyring
-
-
-# Add before partitioning
-echo "Checking disk health..."
-if ! smartctl -H ${DEVICE} &>/dev/null; then
-    echo "Warning: Unable to check disk health. Proceeding anyway..."
-fi
 
 # Clean disk
 echo "Cleaning disk..."
@@ -183,6 +156,53 @@ sleep 3
 partprobe ${DEVICE}
 sleep 3
 
+clear
+# Desktop environment selection
+echo "Select your desktop environment:"
+echo "1) KDE Plasma"
+echo "2) GNOME"
+echo "3) XFCE"
+echo "4) Awesome WM"
+echo "5) DWM"
+echo "6) Cinnamon"
+echo "7) Hyprland"
+read -p "Enter your choice (1-7): " de_choice
+
+case $de_choice in
+    1)  # KDE Plasma
+        DE_PACKAGES="plasma plasma-desktop plasma-wayland-protocols kde-applications sddm"
+        DM_SERVICE="sddm"
+        ;;
+    2)  # GNOME
+        DE_PACKAGES="gnome gnome-extra gdm"
+        DM_SERVICE="gdm"
+        ;;
+    3)  # XFCE
+        DE_PACKAGES="xfce4 xfce4-goodies lightdm lightdm-gtk-greeter"
+        DM_SERVICE="lightdm"
+        ;;
+    4)  # Awesome WM
+        DE_PACKAGES="awesome lightdm lightdm-gtk-greeter"
+        DM_SERVICE="lightdm"
+        ;;
+    5)  # DWM
+        DE_PACKAGES="dwm st dmenu kitty thunar"
+        DM_SERVICE="none"
+        ;;
+    6)  # Cinnamon
+        DE_PACKAGES="cinnamon lightdm lightdm-gtk-greeter"
+        DM_SERVICE="lightdm"
+        ;;
+    7)  # Hyprland
+        DE_PACKAGES="hyprland waybar swaybg swaylock swayidle wlogout mako grim slurp wl-clipboard"
+        DM_SERVICE="none"
+        ;;
+    *)
+        echo "Invalid choice. Exiting..."
+        exit 1
+        ;;
+esac
+
 # Format partitions
 echo "Formatting partitions..."
 mkfs.fat -F 32 ${EFI_PART}
@@ -196,10 +216,6 @@ mkdir -p /mnt/boot
 mount ${EFI_PART} /mnt/boot
 swapon ${SWAP_PART}
 
-# To make fast
-echo "Updating mirror list..."
-reflector --country Japan,Korea --age 12 --protocol https --sort rate --save /etc/pacman.d/mirrorlist
-
 # Install base system
 echo "Installing base system..."
 pacstrap -K /mnt base linux linux-firmware base-devel ${CPU_UCODE} \
@@ -208,23 +224,37 @@ pacstrap -K /mnt base linux linux-firmware base-devel ${CPU_UCODE} \
     reflector dhcpcd bash-completion \
     sudo btrfs-progs htop pacman-contrib pkgfile less \
     git curl wget zsh openssh man-db \
-    xorg plasma plasma-desktop sddm \
-    firefox konsole dolphin dosfstools mtools os-prober --noconfirm
-    
+    xorg xorg-server xorg-apps xorg-drivers xorg-xkill xorg-xinit xterm \
+    mesa libx11 libxft libxinerama freetype2 noto-fonts-emoji usbutils xdg-user-dirs \
+    konsole --noconfirm
+
 # Generate fstab
 echo "Generating fstab..."
 genfstab -U /mnt >> /mnt/etc/fstab
 
+# Install selected desktop environment
+echo "Installing selected desktop environment..."
+arch-chroot /mnt pacman -S --noconfirm ${DE_PACKAGES}
+
+# Enable display manager if applicable
+if [[ $DM_SERVICE != "none" ]]; then
+    arch-chroot /mnt systemctl enable ${DM_SERVICE}
+fi
+
+# 여기 에서 뺌 
+
 # System configuration
 arch-chroot /mnt /bin/bash <<CHROOT_COMMANDS
-# Set timezone to S.Korea
-ln -sf /usr/share/zoneinfo/Asia/Seoul /etc/localtime
+# Set timezone
+ln -sf /usr/share/zoneinfo/Europe/Stockholm /etc/localtime
 hwclock --systohc
 
 # Enable time sync
 systemctl enable systemd-timesyncd
 
 # Set locale
+echo "en_US.UTF-8 UTF-8" >> /etc/locale.gen
+echo "sv_SE.UTF-8 UTF-8" >> /etc/locale.gen
 echo "ko_KR.UTF-8 UTF-8" >> /etc/locale.gen
 locale-gen
 echo "LANG=ko_KR.UTF-8" > /etc/locale.conf
@@ -246,7 +276,6 @@ echo "%wheel ALL=(ALL:ALL) NOPASSWD: ALL" > /etc/sudoers.d/wheel
 # Install and configure bootloader
 bootctl install
 
-# Create bootloader configuration
 mkdir -p /boot/loader/entries
 cat > /boot/loader/loader.conf <<EOF
 default arch.conf
@@ -255,7 +284,6 @@ console-mode max
 editor no
 EOF
 
-# Create arch boot entry
 cat > /boot/loader/entries/arch.conf <<EOF
 title   Arch Linux
 linux   /vmlinuz-linux
@@ -264,156 +292,51 @@ initrd  /initramfs-linux.img
 options root=PARTUUID=$(blkid -s PARTUUID -o value ${ROOT_PART}) rw quiet
 EOF
 
-# ----------------------------------------------------------------------------
-# 데스크탑 및 필수 패키지 설치
+# Install additional packages
 pacman -Sy --noconfirm
 
-# 데스크탑 환경
-pacman -S --noconfirm \
-    xorg xorg-xwayland \
-    plasma plasma-desktop plasma-wayland-protocols \
-    kde-applications sddm
-
-# 글꼴 및 한국어 지원
+# Install Korean fonts and input method
 pacman -S --noconfirm \
     noto-fonts-cjk noto-fonts-emoji \
     adobe-source-han-sans-kr-fonts adobe-source-han-serif-kr-fonts ttf-baekmuk \
-    powerline-fonts nerd-fonts \
-    ttf-lato
-
-# 한국어 입력 및 개발 도구
-pacman -S --noconfirm \
+    powerline-fonts nerd-fonts ttf-lato \
     libhangul fcitx5 fcitx5-configtool fcitx5-hangul fcitx5-gtk fcitx5-qt
-
-# 시스템 도구
-pacman -S --noconfirm \
-    efibootmgr dosfstools mtools os-prober \
-    zsh zsh-autosuggestions zsh-completions zsh-doc zsh-history-substring-search zsh-lovers zsh-syntax-highlighting zshdb \
-    rsync inotify-tools btop tmux kitty
-
-# 개발 및 그래픽 도구
-pacman -S --noconfirm \
-    vim git autoconf pkg-config \
-    imagemagick krita gimp gimp-help-ko \
-    tectonic texlive-basic texlive-bibtexextra texlive-bin \
-    texlive-binextra texlive-context texlive-doc texlive-fontsextra \
-    texlive-fontsrecommended texlive-fontutils texlive-formatsextra \
-    texlive-games texlive-humanities texlive-langchinese \
-    texlive-langcjk texlive-langkorean texstudio
-
-# Qt6 관련 패키지
-pacman -S --noconfirm \
-    qgpgme-qt6 appstream-qt qt6-doc qt6-examples qt6-translations qt6-5compat qt6-base qt6-declarative qt6-quick3d qt6-quicktimeline \
-    qt6-shadertools qt6-svg qt6-tools qt6-wayland qt6-imageformats qt6-3d qt6-networkauth pyside6 poppler-qt6 \
-    python-pyqt6 python-pyqt6-networkauth python-pyqt6-3d python-pyqt6-sip python-qscintilla-qt6 qscintilla-qt6 \
-    qtkeychain-qt6 qt6-charts qt6-datavis3d qt6-lottie qt6-scxml qt6-virtualkeyboard python-pyqt6-charts \
-    python-pyqt6-datavisualization qca-qt6 qt6-connectivity qt6-multimedia qt6-remoteobjects qt6-sensors \
-    qt6-serialbus qt6-serialport qt6-webchannel qt6-webengine qt6-websockets qt6-webview python-pyqt6-webengine \
-    qt6-positioning quazip-qt6 qt6-languageserver qt6-httpserver qt6-multimedia-ffmpeg qt6-multimedia-gstreamer \
-    qt6-quick3dphysics qt6-speech qt6-grpc qt6-location qt6-quickeffectmaker fcitx-qt6 fcitx5-qt \
-    kvantum libfm-qt libqtxdg packagekit-qt6 qt6ct qxlsx-qt6 qxmpp-qt6 polkit-qt6 qt6-graphs phonon-qt6 \
-    phonon-qt6-vlc libqaccessibilityclient-qt6 kdsoap-qt6 qtpbfimageplugin-qt6 doublecmd-qt6 lazarus-qt6 \
-    qt6pas deepin-qt6platform-plugins deepin-qt6integration qt6-xcb-private-headers plasma5support futuresql \
-    libportal-qt6 qcoro python-pyqt6-graphs qt6-connectivity pulseaudio-bluetooth
-
-# 프로그래밍 언어 및 도구
-pacman -S --noconfirm \
-    julia llvm-julia llvm-julia-libs \
-    kotlin lua-stdlib \
-    ruby neko \
-    go go-tools \
-    perl latex2html \
-    nodejs nodejs-emojione nodejs-lts-hydrogen nodejs-lts-iron nodejs-material-design-icons nodejs-nopt \
-    nodejs-source-map nodejs-yaml npm npm-check-updates \
-    rust rust-analyzer rust-bindgen rust-kanban rust-musl rust-script rust-wasm rustic rustlings rustscan rustup \
-    rustypaste rustypaste-cli \
-    gcc gcc-libs gcc-ada gcc-fortran gcc-objc gcc-go lib32-gcc-libs libgccjit gcc-d gcc-m2 gcc-rust \
-    code vscode-css-languageserver vscode-html-languageserver vscode-json-languageserver
-
-# 데이터베이스 관련 패키지
-pacman -S --noconfirm \
-	mariadb mariadb-clients mariadb-libs mariadb-lts mariadb-lts-clients mariadb-lts-libs \
-	sqlite sqlite-analyzer sqlite-doc sqlite-tcl sqlitebrowser vsqlite++ wxsqlite3 ruby-sqlite3 php-sqlite \
-	cowsql
-
-# 응용 프로그램
-pacman -S --noconfirm \
-    firefox thunderbird thunderbird-i18n-ko \
-    libreoffice-fresh libreoffice-fresh-ko \
-    flatpak remmina opentofu chromium \
-    describeimage fortunecraft llm-manager ollama ollama-docs
-
-# 시스템 설정
-pacman -S --noconfirm \
-    xdg-user-dirs xdg-utils \
-    cups cups-pdf nss-mdns \
-    gtk3 gtk2 qt5-base qt5-tools qt5-connectivity qt5-sensors\
-    sddm sddm-kcm \
-    hwloc hwdata lshw ethtool jitterentropy \
-    blendr blueberry bluedevil blueman bluetui bluez \
-    zsh zsh-autosuggestions zsh-completions zsh-doc zsh-history-substring-search zsh-lovers zsh-syntax-highlighting 
-
-# ----------------------------------------------------------------------------
-# Enable basic services
-systemctl enable NetworkManager
-systemctl enable sddm
-
-# Configure Korean fonts and input method
-cd /tmp
-sudo -u ${USERNAME} bash <<EOF
-# Install AUR fonts
-git clone https://aur.archlinux.org/spoqa-han-sans.git
-cd spoqa-han-sans
-yes | makepkg -si --noconfirm
-cd ..
-
-for font in ttf-d2coding ttf-nanum ttf-nanumgothic_coding ttf-kopub ttf-kopubworld; do
-    git clone https://aur.archlinux.org/\${font}.git
-    cd \${font}
-    yes | makepkg -si --noconfirm
-    cd ..
-done
-EOF
 
 # Configure fcitx5
 mkdir -p /home/${USERNAME}/.config/fcitx5/conf
-mkdir -p /home/${USERNAME}/.config/autostart
-mkdir -p /home/${USERNAME}/.local/share/fcitx5/themes
+mkdir -p /home/${USERNAME}/.config/environment.d
 
-# Create fcitx5 autostart entry
-cat > /home/${USERNAME}/.config/autostart/fcitx5.desktop <<EOL
-[Desktop Entry]
-Name=Fcitx 5
-GenericName=Input Method
-Comment=Start Input Method
-Exec=fcitx5
-Icon=fcitx
-Terminal=false
-Type=Application
-Categories=System;Utility;
-X-GNOME-Autostart-Phase=Applications
-X-GNOME-AutoRestart=false
-X-GNOME-Autostart-Notify=false
-X-KDE-autostart-after=panel
-EOL
+cat > /home/${USERNAME}/.config/environment.d/fcitx5.conf <<EOF
+GTK_IM_MODULE=fcitx
+QT_IM_MODULE=fcitx
+XMODIFIERS=@im=fcitx
+EOF
 
-# Configure environment variables
-cat > /home/${USERNAME}/.pam_environment <<EOL
-GTK_IM_MODULE DEFAULT=fcitx5
-QT_IM_MODULE  DEFAULT=fcitx5
-XMODIFIERS    DEFAULT=\@im=fcitx5
-EOL
+cat > /home/${USERNAME}/.config/fcitx5/profile <<EOF
+[Groups/0]
+Name=Default
+Default Layout=us
+DefaultIM=hangul
 
-# Set ownership
+[Groups/0/Items/0]
+Name=keyboard-us
+Layout=
+
+[Groups/0/Items/1]
+Name=hangul
+Layout=
+
+[GroupOrder]
+0=Default
+EOF
+
 chown -R ${USERNAME}:${USERNAME} /home/${USERNAME}/.config
-chown -R ${USERNAME}:${USERNAME} /home/${USERNAME}/.local
-chown ${USERNAME}:${USERNAME} /home/${USERNAME}/.pam_environment
 
 # Generate initramfs
 mkinitcpio -P
 CHROOT_COMMANDS
 
-# Unmount all partitions
+# Unmount partitions
 umount -R /mnt
 
 echo "Installation complete!"
@@ -431,5 +354,3 @@ echo "After first boot:"
 echo "1. Korean input can be toggled with Shift+Space"
 echo "2. Run 'fcitx5-configtool' to configure input method"
 echo "3. Use 'fcitx5 --debug &' if you need to troubleshoot"
-
-
