@@ -170,11 +170,11 @@ read -p "Enter your choice (1-7): " de_choice
 
 case $de_choice in
     1)  # KDE Plasma
-        DE_PACKAGES="plasma plasma-desktop plasma-wayland-protocols kde-applications sddm"
+        DE_PACKAGES="plasma plasma-desktop plasma-wayland-protocols kde-applications sddm ghostty-x86_64-v3-git"
         DM_SERVICE="sddm"
         ;;
     2)  # GNOME
-        DE_PACKAGES="gnome gnome-extra gdm"
+        DE_PACKAGES="gnome gnome-extra gdm ghostty_wrapper"
         DM_SERVICE="gdm"
         ;;
     3)  # XFCE
@@ -245,16 +245,14 @@ fi
 
 # System configuration
 arch-chroot /mnt /bin/bash <<CHROOT_COMMANDS
-# Set timezone
-ln -sf /usr/share/zoneinfo/Europe/Stockholm /etc/localtime
+# Set timezone to S.Korea
+ln -sf /usr/share/zoneinfo/Asia/Seoul /etc/localtime
 hwclock --systohc
 
 # Enable time sync
 systemctl enable systemd-timesyncd
 
 # Set locale
-echo "en_US.UTF-8 UTF-8" >> /etc/locale.gen
-echo "sv_SE.UTF-8 UTF-8" >> /etc/locale.gen
 echo "ko_KR.UTF-8 UTF-8" >> /etc/locale.gen
 locale-gen
 echo "LANG=ko_KR.UTF-8" > /etc/locale.conf
@@ -301,6 +299,32 @@ pacman -S --noconfirm \
     adobe-source-han-sans-kr-fonts adobe-source-han-serif-kr-fonts ttf-baekmuk \
     powerline-fonts nerd-fonts ttf-lato \
     libhangul fcitx5 fcitx5-configtool fcitx5-hangul fcitx5-gtk fcitx5-qt
+
+# 프로그래밍 언어 및 도구
+pacman -S --noconfirm \
+    julia llvm-julia llvm-julia-libs \
+    kotlin lua-stdlib \
+    ruby neko \
+    go go-tools \
+    perl latex2html \
+    nodejs nodejs-emojione nodejs-lts-hydrogen nodejs-lts-iron nodejs-material-design-icons nodejs-nopt \
+    nodejs-source-map nodejs-yaml npm npm-check-updates \
+    rust rust-analyzer rust-bindgen rust-kanban rust-musl rust-script rust-wasm rustic rustlings rustscan rustup \
+    rustypaste rustypaste-cli \
+    gcc gcc-libs gcc-ada gcc-fortran gcc-objc gcc-go lib32-gcc-libs libgccjit gcc-d gcc-m2 gcc-rust \
+    code vscode-css-languageserver vscode-html-languageserver vscode-json-languageserver
+
+ # 데이터베이스 관련 패키지
+pacman -S --noconfirm \
+	mariadb mariadb-clients mariadb-libs mariadb-lts mariadb-lts-clients mariadb-lts-libs \
+	sqlite sqlite-analyzer sqlite-doc sqlite-tcl sqlitebrowser vsqlite++ wxsqlite3 ruby-sqlite3 php-sqlite \
+	cowsql
+
+pacman -S --noconfirm \
+    firefox thunderbird thunderbird-i18n-ko \
+    libreoffice-fresh libreoffice-fresh-ko \
+    flatpak remmina opentofu chromium \
+    describeimage fortunecraft llm-manager ollama ollama-docs ghostty
 
 # Configure fcitx5
 mkdir -p /home/${USERNAME}/.config/fcitx5/conf
