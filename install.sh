@@ -178,11 +178,11 @@ case $de_choice in
         DM_SERVICE="gdm"
         ;;
     3)  # XFCE
-        DE_PACKAGES="xfce4 xfce4-goodies lightdm lightdm-gtk-greeter thunar"
+        DE_PACKAGES="xfce4 xfce4-goodies lightdm lightdm-gtk-greeter thunar lxsession rxvt-unicode"
         DM_SERVICE="lightdm"
         ;;
     4)  # Awesome WM
-        DE_PACKAGES="awesome lightdm lightdm-gtk-greeter"
+        DE_PACKAGES="awesome lightdm lightdm-gtk-greeter thunar"
         DM_SERVICE="lightdm"
         ;;
     5)  # DWM
@@ -194,8 +194,8 @@ case $de_choice in
         DM_SERVICE="lightdm"
         ;;
     7)  # Hyprland
-        DE_PACKAGES="hyprland waybar swaybg swaylock swayidle wlogout mako grim slurp wl-clipboard"
-        DM_SERVICE="none"
+        DE_PACKAGES="hyprcursor hyprutils aquamarine hypridle hyprlock hyprland pyprland hyprland-qtutils waybar swaybg swaylock swayidle wlogout mako grim slurp wl-clipboard thunar"
+        DM_SERVICE="sddm"
         ;;
     *)
         echo "Invalid choice. Exiting..."
@@ -226,7 +226,7 @@ pacstrap -K /mnt base linux linux-firmware base-devel ${CPU_UCODE} \
     git curl wget zsh openssh man-db \
     xorg xorg-server xorg-apps xorg-drivers xorg-xkill xorg-xinit xterm \
     mesa libx11 libxft libxinerama freetype2 noto-fonts-emoji usbutils xdg-user-dirs \
-    konsole --noconfirm
+    konsole bluez bluez-utils blueman --noconfirm
 
 # Generate fstab
 echo "Generating fstab..."
