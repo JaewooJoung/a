@@ -116,6 +116,38 @@ else
     ROOT_PART="${DEVICE}3"
 fi
 
+
+# Get total RAM and calculate recommended swap size
+TOTAL_RAM=$(grep MemTotal /proc/meminfo | awk '{print $2}')
+TOTAL_RAM_GB=$((TOTAL_RAM / 1024 / 1024))
+
+# Calculate swap size based on RAM
+if [ $TOTAL_RAM_GB -le 2 ]; then
+    SWAP_SIZE=4
+elif [ $TOTAL_RAM_GB -le 8 ]; then
+    SWAP_SIZE=8
+elif [ $TOTAL_RAM_GB -le 16 ]; then
+    SWAP_SIZE=16
+elif [ $TOTAL_RAM_GB -le 64 ]; then
+    SWAP_SIZE=16
+else
+    SWAP_SIZE=32
+fi
+
+# Ask user if they want to modify swap size
+echo "Recommended swap size based on your RAM (${TOTAL_RAM_GB}GB) is ${SWAP_SIZE}GB"
+read -p "Enter desired swap size in GB (press Enter for recommended size): " input_swap_size
+if [ -n "$input_swap_size" ]; then
+    SWAP_SIZE=$input_swap_size
+fi
+
+# Ask for swappiness value
+echo "Recommended swappiness:"
+echo "- For desktop/laptop with high RAM (>16GB): 10"
+echo "- For server or low RAM system: 60"
+read -p "Enter desired swappiness value (10-60, default: 10): " input_swappiness
+SWAPPINESS=${input_swappiness:-10}
+
 # Show installation plan
 echo "==========================="
 echo "Installation Plan:"
@@ -148,7 +180,7 @@ sgdisk -o ${DEVICE}
 
 # Create partitions
 sgdisk -n 1:0:+1G -t 1:ef00 -c 1:"EFI System Partition" ${DEVICE}
-sgdisk -n 2:0:+8G -t 2:8200 -c 2:"Linux swap" ${DEVICE}
+sgdisk -n 2:0:+${SWAP_SIZE}G -t 2:8200 -c 2:"Linux swap" ${DEVICE}
 sgdisk -n 3:0:0 -t 3:8300 -c 3:"Linux root" ${DEVICE}
 
 # Wait for kernel to update partition table
@@ -336,7 +368,7 @@ Layout=
 EOF
 
 chown -R ${USERNAME}:${USERNAME} /home/${USERNAME}/.config
-
+echo "vm.swappiness=${SWAPPINESS}" > /etc/sysctl.d/99-swappiness.conf
 # Generate initramfs
 mkinitcpio -P
 CHROOT_COMMANDS
