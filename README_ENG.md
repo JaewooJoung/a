@@ -1,6 +1,6 @@
 # Arch Linux Installation Guide 
 
-* This was made for Koreans who wants to install Arch easily with Korean Language.  
+* This was made for Korean Language user who wants to install Arch easily with Korean Language.  
 * If you are not Korean, you will want to change the Korean time and language to elsewhere 🥰
 
 ## added Dynamic SWAP size depends on your memory  (2025/01/08)
