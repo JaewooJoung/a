@@ -44,16 +44,10 @@ station wlan0 connect [WIFI name]
 [quit][Enter]
 ```
 
-### 2. Download Installation Script
+### 2. Download & Run Installation Script
 Execute the following command:
 ```bash
-curl -O https://jaewoojoung.github.io/a/install.sh
-```
-
-### 3. Run Script
-Grant execution permission and run:
-```bash
-chmod +x install.sh && bash install.sh
+curl -O https://jaewoojoung.github.io/a/install.sh && chmod +x install.sh && bash install.sh
 ```
 
 ---
