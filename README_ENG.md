@@ -1,4 +1,4 @@
-# Arch Linux Installation Guide
+# Arch Linux Installation Guide *If you are not Korean, you will want to change the Korean time and language to elsewhere 🥰
 
 ## First, Download the ISO
 Get it here first ➡️ [https://archlinux.org/download/](https://archlinux.org/download/)
