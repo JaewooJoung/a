@@ -1,16 +1,20 @@
-# Arch Linux Installation Guide *If you are not Korean, you will want to change the Korean time and language to elsewhere 🥰
+# Arch Linux Installation Guide 
+
+* This was made for Koreans who wants to install Arch easily with Korean Language.  
+* If you are not Korean, you will want to change the Korean time and language to elsewhere 🥰
 
 ## added Dynamic SWAP size depends on your memory  (2025/01/08)
 
 ## First, Download the ISO
-Get it here first ➡️ [https://archlinux.org/download/](https://archlinux.org/download/)
-For Windows users, create a bootable USB ➡️ [https://rufus.ie/](https://rufus.ie/)
-Linux users should already know, and Mac users... 🤭
+Get it here ➡️  [https://archlinux.org/download/](https://archlinux.org/download/)
+For Windows users, create a bootable USB ➡️  [https://rufus.ie/](https://rufus.ie/)
+Linux users know how, and Mac users... 🤭
 
 ## Installation Guide
 ### 1. Internet Connection
 Wired internet connects automatically.
-For wireless internet:
+For wireless internet connection:<br>
+<img src="https://jaewoojoung.github.io/a/internet.png" alt="No internet cable?" width="600"/> 
 ```bash
 iwctl
 station wlan0 connect [WIFI name]
@@ -19,38 +23,37 @@ station wlan0 connect [WIFI name]
 ```
 
 ### 2. Download Installation Script
-Execute this command:
+Execute the following command:
 ```bash
 curl -O https://jaewoojoung.github.io/a/install.sh
 ```
 
 ### 3. Run Script
-Grant permission and run:
+Grant execution permission and run:
 ```bash
 chmod +x install.sh && bash install.sh
 ```
 
 ---
 # 🚀 Automatic Installation Guide
-
 ## 📝 Introduction
-Easy Arch Linux installation guide
+This guide explains how to easily install Arch Linux using an automatic installation script.
 
-## ⚠️ Prerequisites
-- UEFI boot mode required
-- Internet connection needed
-- Bootable USB required
-- **Warning**: All data will be deleted!
+## ⚠️ Before Starting
+- Must boot in UEFI mode
+- Internet connection required
+- Need Arch Linux environment booted from USB
+- **Warning**: All data on the selected disk will be deleted!
 
-## 🎮 Installation Steps
-
-### Step-by-Step
+## 🎮 Installation Process
+### Step-by-Step Guide
 1. **System Check** 🔍
-   - UEFI mode check
-   - Keyboard layout setup
+   - Verify UEFI mode
+   - Set keyboard layout (Default: US)
 
-2. **Drive Selection** 💽
-   - Choose installation drive
+2. **Hard Drive Selection** 💽
+   - Shows list of all system hard drives
+   - Select installation drive by number
    ```
    Example:
    1. sda      500GB  disk
@@ -64,51 +67,52 @@ Easy Arch Linux installation guide
    ```
 
 4. **Account Setup** 👤
-   - Username
-   - Hostname
-   - Root password
-   - User password
+   - Enter username
+   - Enter computer name (hostname)
+   - Set root password
+   - Set user password
 
-5. **Installation Confirmation** 📋
-   - Choose desktop (KDE recommended)
-   - 5-second countdown
+5. **Installation Plan Confirmation** 📋
+   - Choose desktop environment (KDE recommended)
+   - 5-second countdown (Press Ctrl+C to cancel)
 
-### 4️⃣ Automatic Process 🚀
+### 4️⃣ Automatic Installation Process 🚀
 Script performs:
-- Disk setup
-- System installation
-- Desktop setup
-- Tools installation
-- Input setup
+- Disk partitioning
+- Base system installation
+- Desktop environment setup
+- Development tools installation
+- Input method (fcitx5) setup
 
-## 🎉 After Installation
-
-### 1️⃣ Before First Boot
-1. Shutdown
+## 🎉 Post-Installation Tasks
+### 1️⃣ Pre-First Boot Preparation
+1. Complete shutdown
 2. Remove USB
-3. BIOS settings:
-   - Load defaults
+3. Change BIOS settings:
+   - Load BIOS defaults
    - Disable Secure Boot
-   - Set UEFI
-   - Set boot order
+   - Set UEFI mode
+   - Configure boot order
 
-### 2️⃣ First Boot Setup
-1. Input Method Setup
-   - Run `fcitx5-configtool`
-   - Select fcitx5 in settings
-   - Reboot
+### 2️⃣ First Boot Configuration
+1. Activate Input Method
+   - Run `fcitx5-configtool` in terminal<br>
+<img src="https://jaewoojoung.github.io/a/fcitxconfig.png" alt="fcitx config" width="660"/>
+   - Click **fcitx5** under virtual keyboard settings<br>
+<img src="https://jaewoojoung.github.io/a/virtualkey.png" alt="virtual key" width="660"/>
+   - Reboot computer
 
 ## 🎨 Installed Programs
 - 🌐 Firefox, Chromium
 - 📝 LibreOffice
-- 💻 Development Tools (VSCode, Git)
+- 💻 Development Tools (VSCode, Git, etc.)
 - 🎨 Graphics Tools (GIMP, Krita)
 - 🔧 System Tools
 
 ## 💡 Troubleshooting
 If issues occur:
-1. Check internet
-2. Verify UEFI
+1. Check internet connection
+2. Verify UEFI mode
 3. Debug with `fcitx5 --debug &`
 
-## 🌈 Congratulations! You're now using the latest Linux🐧 technologies! 🥰
+## 🌈 Congratulations! You're now using **all** the latest Linux🐧 technologies! 🥰
