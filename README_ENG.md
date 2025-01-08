@@ -2,6 +2,28 @@
 
 * This was made for Korean Language user who wants to install Arch easily with Korean Language.  
 * If you are not Korean, you will want to change the Korean time and language to elsewhere 🥰
+### example
+```bash
+# Set timezone to S.Korea
+ln -sf /usr/share/zoneinfo/Asia/Seoul /etc/localtime
+hwclock --systohc
+
+# Set locale
+echo "ko_KR.UTF-8 UTF-8" >> /etc/locale.gen
+locale-gen
+echo "LANG=ko_KR.UTF-8" > /etc/locale.conf
+```
+⬇️⬇️⬇️⬇️⬇️⬇️⬇️⬇️⬇️⬇️⬇️⬇️⬇️⬇️⬇️⬇️⬇️⬇️⬇️⬇️⬇️⬇️⬇️⬇️⬇️⬇️⬇️⬇️⬇️⬇️⬇️⬇️⬇️⬇️⬇️⬇️⬇️⬇️⬇️⬇️⬇️⬇️⬇️⬇️⬇️⬇️⬇️⬇️⬇️⬇️⬇️⬇️⬇️⬇️⬇️⬇️⬇️⬇️⬇️⬇️
+```bash
+# Set timezone to Sweden
+ln -sf /usr/share/zoneinfo/Europe/Stockholm /etc/localtime
+hwclock --systohc
+
+# Set locale
+echo "sv_SE.UTF-8 UTF-8" >> /etc/locale.gen
+locale-gen
+echo "LANG=sv_SE.UTF-8" > /etc/locale.conf
+```
 
 ## added Dynamic SWAP size depends on your memory  (2025/01/08)
 
