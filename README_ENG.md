@@ -1,5 +1,7 @@
 # Arch Linux Installation Guide *If you are not Korean, you will want to change the Korean time and language to elsewhere 🥰
 
+## added Dynamic SWAP size depends on your memory  
+
 ## First, Download the ISO
 Get it here first ➡️ [https://archlinux.org/download/](https://archlinux.org/download/)
 For Windows users, create a bootable USB ➡️ [https://rufus.ie/](https://rufus.ie/)
