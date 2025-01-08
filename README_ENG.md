@@ -1,6 +1,6 @@
 # Arch Linux Installation Guide *If you are not Korean, you will want to change the Korean time and language to elsewhere 🥰
 
-## added Dynamic SWAP size depends on your memory  
+## added Dynamic SWAP size depends on your memory  (2025/01/08)
 
 ## First, Download the ISO
 Get it here first ➡️ [https://archlinux.org/download/](https://archlinux.org/download/)
