@@ -6,6 +6,17 @@ if [ "$EUID" -ne 0 ]; then
     exit 1
 fi
 
+# 디스크 공간 확인
+echo "디스크 공간을 확인합니다..."
+FREE_SPACE=$(df / | tail -1 | awk '{print $4}')
+REQUIRED_SPACE=70000  # 70MB 이상 필요
+
+if [ "$FREE_SPACE" -lt "$REQUIRED_SPACE" ]; then
+    echo "오류: 루트 파티션에 충분한 공간이 없습니다. 최소 70MB 이상 필요합니다."
+    echo "현재 사용 가능한 공간: $FREE_SPACE blocks"
+    exit 1
+fi
+
 # 한국어 지원 설정
 echo "한국어 지원을 설정 중입니다..."
 
