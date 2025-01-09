@@ -24,6 +24,10 @@ echo "한국어 지원을 설정 중입니다..."
 echo "한국어 폰트를 설치합니다..."
 pacman -Sy --noconfirm noto-fonts-cjk adobe-source-han-sans-kr-fonts adobe-source-han-serif-kr-fonts ttf-baekmuk
 
+# 폰트 캐시 업데이트
+echo "폰트 캐시를 업데이트합니다..."
+fc-cache -fv
+
 # 로케일 설정
 echo "로케일을 한국어로 설정합니다..."
 sed -i '/ko_KR.UTF-8/s/^#//g' /etc/locale.gen
