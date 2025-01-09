@@ -18,6 +18,7 @@ echo "로케일을 한국어로 설정합니다..."
 sed -i '/ko_KR.UTF-8/s/^#//g' /etc/locale.gen
 locale-gen
 echo "LANG=ko_KR.UTF-8" > /etc/locale.conf
+export LANG=ko_KR.UTF-8
 
 # 시간대 설정
 echo "시간대를 서울로 설정합니다..."
@@ -55,6 +56,26 @@ Layout=
 
 [GroupOrder]
 0=Default
+EOF
+
+# 환경 변수 적용
+echo "환경 변수를 적용합니다..."
+source /etc/environment.d/fcitx5.conf
+
+# 한국어 지원 테스트
+echo "한국어 지원 테스트:"
+echo "안녕하세요, Arch Linux!"
+sleep 2
+
+# 한국어 입력기 자동 시작 설정
+echo "한국어 입력기를 자동 시작으로 설정합니다..."
+mkdir -p /etc/xdg/autostart
+cat > /etc/xdg/autostart/fcitx5.desktop <<EOF
+[Desktop Entry]
+Type=Application
+Name=fcitx5
+Exec=fcitx5
+Comment=Korean Input Method
 EOF
 
 echo "한국어 지원 설정이 완료되었습니다."
@@ -351,6 +372,7 @@ systemctl enable systemd-timesyncd
 echo "ko_KR.UTF-8 UTF-8" >> /etc/locale.gen
 locale-gen
 echo "LANG=ko_KR.UTF-8" > /etc/locale.conf
+export LANG=ko_KR.UTF-8
 
 # Set hostname
 echo "${HOSTNAME}" > /etc/hostname
