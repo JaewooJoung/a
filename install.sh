@@ -338,6 +338,14 @@ useradd -m -G wheel,audio,video,optical,storage -s /bin/bash ${USERNAME}
 echo "${USERNAME}:${USER_PASSWORD}" | chpasswd
 echo "%wheel ALL=(ALL:ALL) NOPASSWD: ALL" > /etc/sudoers.d/wheel
 
+# Configure autologin
+mkdir -p /etc/systemd/system/getty@tty1.service.d
+cat > /etc/systemd/system/getty@tty1.service.d/override.conf <<EOF
+[Service]
+ExecStart=
+ExecStart=-/sbin/agetty -a ${USERNAME} - \$TERM
+EOF
+
 # Install and configure bootloader
 bootctl install
 
