@@ -7,6 +7,7 @@ if [ "$EUID" -ne 0 ]; then
 fi
 
 # Show all hard drives
+clear
 echo "Here are all the hard drives in the system:"
 drives=($(lsblk -d -o NAME,SIZE,TYPE | grep disk | nl -w2 -s'. ' | awk '{print $2}'))
 lsblk -d -o NAME,SIZE,TYPE | grep disk | nl -w2 -s'. '
@@ -24,6 +25,7 @@ else
 fi
 
 # Show CPU type selection
+clear
 echo "Select your CPU type:"
 echo "1. Intel"
 echo "2. AMD"
@@ -134,19 +136,47 @@ else
     SWAP_SIZE=32
 fi
 
-# Ask user if they want to modify swap size
-echo "Recommended swap size based on your RAM (${TOTAL_RAM_GB}GB) is ${SWAP_SIZE}GB"
-read -p "Enter desired swap size in GB (press Enter for recommended size): " input_swap_size
-if [ -n "$input_swap_size" ]; then
-    SWAP_SIZE=$input_swap_size
+# Calculate recommended swap size based on RAM
+if [ ${TOTAL_RAM_GB} -le 8 ]; then
+    # For RAM ≤ 8GB, use equal swap size
+    SWAP_SIZE=${TOTAL_RAM_GB}
+else
+    # For RAM > 8GB, use the original calculation
+    SWAP_SIZE=$((TOTAL_RAM_GB / 2))
 fi
 
-# Ask for swappiness value
-echo "Recommended swappiness:"
-echo "- For desktop/laptop with high RAM (>16GB): 10"
-echo "- For server or low RAM system: 60"
-read -p "Enter desired swappiness value (10-60, default: 10): " input_swappiness
-SWAPPINESS=${input_swappiness:-10}
+# Set swappiness based on RAM size
+if [ ${TOTAL_RAM_GB} -gt 32 ]; then
+    SWAPPINESS=10  # Low swappiness for high RAM systems
+else
+    SWAPPINESS=60  # Higher swappiness for systems with less RAM
+fi
+
+# Inform user of automatic settings
+echo "Based on your RAM size (${TOTAL_RAM_GB}GB):"
+echo "- Swap size set to: ${SWAP_SIZE}GB"
+echo "- Swappiness set to: ${SWAPPINESS}"
+
+# Ask if user wants to override these settings
+read -p "Do you want to override these settings? (y/N): " override
+
+if [ "${override,,}" = "y" ]; then
+    # Allow manual input for swap size
+    read -p "Enter desired swap size in GB: " input_swap_size
+    if [ -n "$input_swap_size" ]; then
+        SWAP_SIZE=$input_swap_size
+    fi
+    
+    # Allow manual input for swappiness
+    read -p "Enter desired swappiness value (10-60): " input_swappiness
+    if [ -n "$input_swappiness" ]; then
+        SWAPPINESS=$input_swappiness
+    fi
+    
+    echo "Updated settings:"
+    echo "- Swap size: ${SWAP_SIZE}GB"
+    echo "- Swappiness: ${SWAPPINESS}"
+fi
 
 # Show installation plan
 echo "==========================="
@@ -160,8 +190,8 @@ echo "Hostname: ${HOSTNAME}"
 echo "CPU Type: ${CPU_UCODE}"
 echo "==========================="
 echo "WARNING: This will COMPLETELY ERASE the selected drive!"
-echo "Press Ctrl+C within 5 seconds to cancel..."
-sleep 5
+echo "Press Ctrl+C within 3 seconds to cancel..."
+sleep 3
 
 # Initialize pacman
 pacman-key --init
@@ -236,12 +266,14 @@ case $de_choice in
 esac
 
 # Format partitions
+clear
 echo "Formatting partitions..."
 mkfs.fat -F 32 ${EFI_PART}
 mkswap ${SWAP_PART}
 mkfs.ext4 ${ROOT_PART}
 
 # Mount partitions
+clear
 echo "Mounting partitions..."
 mount ${ROOT_PART} /mnt
 mkdir -p /mnt/boot
@@ -249,6 +281,7 @@ mount ${EFI_PART} /mnt/boot
 swapon ${SWAP_PART}
 
 # Install base system
+clear
 echo "Installing base system..."
 pacstrap -K /mnt base linux linux-firmware base-devel ${CPU_UCODE} \
     networkmanager terminus-font vim efibootmgr \
@@ -261,10 +294,12 @@ pacstrap -K /mnt base linux linux-firmware base-devel ${CPU_UCODE} \
     konsole bluez bluez-utils blueman --noconfirm
 
 # Generate fstab
+clear
 echo "Generating fstab..."
 genfstab -U /mnt >> /mnt/etc/fstab
 
 # Install selected desktop environment
+clear
 echo "Installing selected desktop environment..."
 arch-chroot /mnt pacman -S --noconfirm ${DE_PACKAGES}
 
@@ -323,6 +358,7 @@ options root=PARTUUID=$(blkid -s PARTUUID -o value ${ROOT_PART}) rw quiet
 EOF
 
 # Install additional packages
+clear
 pacman -Sy --noconfirm
 
 # Install Korean fonts and input method
@@ -375,7 +411,7 @@ CHROOT_COMMANDS
 
 # Unmount partitions
 umount -R /mnt
-
+clear
 echo "Installation complete!"
 echo ""
 echo "IMPORTANT POST-INSTALLATION STEPS:"
