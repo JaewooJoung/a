@@ -378,12 +378,23 @@ EOF
         
     7)  # Hyprland (SDDM)
         mkdir -p /etc/sddm.conf.d
-        cat > /etc/sddm.conf.d/autologin.conf <<EOF
+        # First try common configuration location
+        if [ -f /usr/share/wayland-sessions/hyprland.desktop ]; then
+            cat > /etc/sddm.conf.d/autologin.conf <<EOF
+[Autologin]
+User=${USERNAME}
+Session=hyprland.desktop
+Relogin=false
+EOF
+        else
+            # Fallback to alternative session name
+            cat > /etc/sddm.conf.d/autologin.conf <<EOF
 [Autologin]
 User=${USERNAME}
 Session=hyprland
 Relogin=false
 EOF
+        fi
         ;;
         
     5)  # DWM (No Display Manager)
