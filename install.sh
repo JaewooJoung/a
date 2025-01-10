@@ -339,16 +339,47 @@ echo "${USERNAME}:${USER_PASSWORD}" | chpasswd
 echo "%wheel ALL=(ALL:ALL) NOPASSWD: ALL" > /etc/sudoers.d/wheel
 
 # Configure autologin based on desktop environment selection
-if [ "$de_choice" = "1" ]; then
-    # Configure SDDM autologin for KDE Plasma
-    mkdir -p /etc/sddm.conf.d
-    cat > /etc/sddm.conf.d/autologin.conf <<EOF
+case $de_choice in
+    1)  # KDE Plasma (SDDM)
+        mkdir -p /etc/sddm.conf.d
+        cat > /etc/sddm.conf.d/autologin.conf <<EOF
 [Autologin]
 User=${USERNAME}
 Session=plasma.desktop
 Relogin=false
 EOF
-fi
+        ;;
+        
+    2)  # GNOME (GDM)
+        sed -i "s/^#.*AutomaticLoginEnable=.*/AutomaticLoginEnable=true/" /etc/gdm/custom.conf
+        sed -i "s/^#.*AutomaticLogin=.*/AutomaticLogin=${USERNAME}/" /etc/gdm/custom.conf
+        ;;
+        
+    3|4|6)  # XFCE, Awesome WM, Cinnamon (LightDM)
+        mkdir -p /etc/lightdm
+        cat > /etc/lightdm/lightdm.conf <<EOF
+[Seat:*]
+autologin-user=${USERNAME}
+autologin-session=default
+EOF
+        ;;
+        
+    7)  # Hyprland (SDDM)
+        mkdir -p /etc/sddm.conf.d
+        cat > /etc/sddm.conf.d/autologin.conf <<EOF
+[Autologin]
+User=${USERNAME}
+Session=hyprland
+Relogin=false
+EOF
+        ;;
+        
+    5)  # DWM (No Display Manager)
+        # For DWM, we'll add automatic startx to .bash_profile
+        echo "[[ -z \$DISPLAY && \$XDG_VTNR -eq 1 ]] && exec startx" >> /home/${USERNAME}/.bash_profile
+        chown ${USERNAME}:${USERNAME} /home/${USERNAME}/.bash_profile
+        ;;
+esac
 
 # Install and configure bootloader
 bootctl install
