@@ -351,8 +351,20 @@ EOF
         ;;
         
     2)  # GNOME (GDM)
-        sed -i "s/^#.*AutomaticLoginEnable=.*/AutomaticLoginEnable=true/" /etc/gdm/custom.conf
-        sed -i "s/^#.*AutomaticLogin=.*/AutomaticLogin=${USERNAME}/" /etc/gdm/custom.conf
+        mkdir -p /etc/gdm
+        cat > /etc/gdm/custom.conf <<EOF
+[daemon]
+AutomaticLoginEnable=True
+AutomaticLogin=${USERNAME}
+
+[security]
+
+[xdmcp]
+
+[chooser]
+
+[debug]
+EOF
         ;;
         
     3|4|6)  # XFCE, Awesome WM, Cinnamon (LightDM)
