@@ -338,13 +338,17 @@ useradd -m -G wheel,audio,video,optical,storage -s /bin/bash ${USERNAME}
 echo "${USERNAME}:${USER_PASSWORD}" | chpasswd
 echo "%wheel ALL=(ALL:ALL) NOPASSWD: ALL" > /etc/sudoers.d/wheel
 
-# Configure autologin
-mkdir -p /etc/systemd/system/getty@tty1.service.d
-cat > /etc/systemd/system/getty@tty1.service.d/override.conf <<EOF
-[Service]
-ExecStart=
-ExecStart=-/sbin/agetty -a ${USERNAME} - \$TERM
+# Configure autologin based on desktop environment selection
+if [ "$de_choice" = "1" ]; then
+    # Configure SDDM autologin for KDE Plasma
+    mkdir -p /etc/sddm.conf.d
+    cat > /etc/sddm.conf.d/autologin.conf <<EOF
+[Autologin]
+User=${USERNAME}
+Session=plasma.desktop
+Relogin=false
 EOF
+fi
 
 # Install and configure bootloader
 bootctl install
