@@ -367,39 +367,44 @@ AutomaticLogin=${USERNAME}
 EOF
         ;;
         
-    3|4|6)  # XFCE, Awesome WM, Cinnamon (LightDM)
+    3)  # XFCE (LightDM)
+        # Create main LightDM config
         mkdir -p /etc/lightdm
         cat > /etc/lightdm/lightdm.conf <<EOF
 [Seat:*]
 autologin-user=${USERNAME}
-autologin-session=default
+autologin-session=xfce
+user-session=xfce
+greeter-session=lightdm-gtk-greeter
 EOF
-        ;;
-        
-    7)  # Hyprland (SDDM)
-        mkdir -p /etc/sddm.conf.d
-        # First try common configuration location
-        if [ -f /usr/share/wayland-sessions/hyprland.desktop ]; then
-            cat > /etc/sddm.conf.d/autologin.conf <<EOF
-[Autologin]
-User=${USERNAME}
-Session=hyprland.desktop
-Relogin=false
+
+        # Create additional auth configuration
+        mkdir -p /etc/lightdm/lightdm.conf.d
+        cat > /etc/lightdm/lightdm.conf.d/autologin.conf <<EOF
+[Seat:*]
+autologin-user=${USERNAME}
 EOF
-        else
-            # Fallback to alternative session name
-            cat > /etc/sddm.conf.d/autologin.conf <<EOF
-[Autologin]
-User=${USERNAME}
-Session=hyprland
-Relogin=false
-EOF
-        fi
+
+        # Add user to autologin group
+        groupadd -f autologin
+        gpasswd -a ${USERNAME} autologin
         ;;
         
     5)  # DWM (No Display Manager)
-        # For DWM, we'll add automatic startx to .bash_profile
-        echo "[[ -z \$DISPLAY && \$XDG_VTNR -eq 1 ]] && exec startx" >> /home/${USERNAME}/.bash_profile
+        # Create xinitrc for DWM
+        cat > /home/${USERNAME}/.xinitrc <<EOF
+exec dwm
+EOF
+        chown ${USERNAME}:${USERNAME} /home/${USERNAME}/.xinitrc
+        
+        # Set up automatic startx on login
+        cat >> /home/${USERNAME}/.bash_profile <<EOF
+
+# Autostart X at login
+if [ -z "\${DISPLAY}" ] && [ "\${XDG_VTNR}" -eq 1 ]; then
+    exec startx
+fi
+EOF
         chown ${USERNAME}:${USERNAME} /home/${USERNAME}/.bash_profile
         ;;
 esac
