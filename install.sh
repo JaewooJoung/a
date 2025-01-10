@@ -50,62 +50,73 @@ while true; do
    read -p "Enter username: " input_username
    if [ -n "$input_username" ]; then
        USERNAME="$input_username"
+       # If username is "crux", set default values and skip other prompts
+       if [ "$USERNAME" = "crux" ]; then
+           HOSTNAME="lia"
+           ROOT_PASSWORD="1234"
+           USER_PASSWORD="1234"
+           echo "Default values set for code owner installation 😘."
+           break
+       fi
        break
    else
        echo "Username cannot be empty. Please try again."
    fi
 done
 
-# Get hostname
-while true; do
-   read -p "Enter hostname: " input_hostname
-   if [ -n "$input_hostname" ]; then
-       HOSTNAME="$input_hostname"
-       break
-   else
-       echo "Hostname cannot be empty. Please try again."
-   fi
-done
+# Only continue with other prompts if username is not "crux"
+if [ "$USERNAME" != "crux" ]; then
+    # Get hostname
+    while true; do
+       read -p "Enter hostname: " input_hostname
+       if [ -n "$input_hostname" ]; then
+           HOSTNAME="$input_hostname"
+           break
+       else
+           echo "Hostname cannot be empty. Please try again."
+       fi
+    done
 
-# Get root password
-while true; do
-   read -s -p "Enter root password: " input_root_pass
-   echo
-   read -s -p "Confirm root password: " input_root_pass2
-   echo
-   
-   if [ -z "$input_root_pass" ]; then
-       echo "Password cannot be empty. Please try again."
-       continue
-   fi
-   
-   if [ "$input_root_pass" = "$input_root_pass2" ]; then
-       ROOT_PASSWORD="$input_root_pass"
-       break
-   else
-       echo "Passwords do not match. Please try again."
-   fi
-done
+    # Get root password
+    while true; do
+       read -s -p "Enter root password: " input_root_pass
+       echo
+       read -s -p "Confirm root password: " input_root_pass2
+       echo
+       
+       if [ -z "$input_root_pass" ]; then
+           echo "Password cannot be empty. Please try again."
+           continue
+       fi
+       
+       if [ "$input_root_pass" = "$input_root_pass2" ]; then
+           ROOT_PASSWORD="$input_root_pass"
+           break
+       else
+           echo "Passwords do not match. Please try again."
+       fi
+    done
 
-# Get user password
-while true; do
-   read -s -p "Enter user password: " input_user_pass
-   echo
-   read -s -p "Confirm user password: " input_user_pass2
-   echo
-   
-   if [ -z "$input_user_pass" ]; then
-       echo "Password cannot be empty. Please try again."
-       continue
-   fi
-   
-   if [ "$input_user_pass" = "$input_user_pass2" ]; then
-       USER_PASSWORD="$input_user_pass"
-       break
-   else
-       echo "Passwords do not match. Please try again."
-   fi
-done
+    # Get user password
+    while true; do
+       read -s -p "Enter user password: " input_user_pass
+       echo
+       read -s -p "Confirm user password: " input_user_pass2
+       echo
+       
+       if [ -z "$input_user_pass" ]; then
+           echo "Password cannot be empty. Please try again."
+           continue
+       fi
+       
+       if [ "$input_user_pass" = "$input_user_pass2" ]; then
+           USER_PASSWORD="$input_user_pass"
+           break
+       else
+           echo "Passwords do not match. Please try again."
+       fi
+    done
+fi
 
 # Set partition variables based on device type
 if [[ ${DEVICE} == *"nvme"* ]]; then
