@@ -367,45 +367,8 @@ AutomaticLogin=${USERNAME}
 EOF
         ;;
         
-    3)  # XFCE (LightDM)
-        # Create main LightDM config
-        mkdir -p /etc/lightdm
-        cat > /etc/lightdm/lightdm.conf <<EOF
-[Seat:*]
-autologin-user=${USERNAME}
-autologin-session=xfce
-user-session=xfce
-greeter-session=lightdm-gtk-greeter
-EOF
-
-        # Create additional auth configuration
-        mkdir -p /etc/lightdm/lightdm.conf.d
-        cat > /etc/lightdm/lightdm.conf.d/autologin.conf <<EOF
-[Seat:*]
-autologin-user=${USERNAME}
-EOF
-
-        # Add user to autologin group
-        groupadd -f autologin
-        gpasswd -a ${USERNAME} autologin
-        ;;
-        
-    5)  # DWM (No Display Manager)
-        # Create xinitrc for DWM
-        cat > /home/${USERNAME}/.xinitrc <<EOF
-exec dwm
-EOF
-        chown ${USERNAME}:${USERNAME} /home/${USERNAME}/.xinitrc
-        
-        # Set up automatic startx on login
-        cat >> /home/${USERNAME}/.bash_profile <<EOF
-
-# Autostart X at login
-if [ -z "\${DISPLAY}" ] && [ "\${XDG_VTNR}" -eq 1 ]; then
-    exec startx
-fi
-EOF
-        chown ${USERNAME}:${USERNAME} /home/${USERNAME}/.bash_profile
+    *)  # All other DEs - no autologin configuration
+        # They will use default login behavior
         ;;
 esac
 
