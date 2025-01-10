@@ -123,26 +123,16 @@ fi
 TOTAL_RAM=$(grep MemTotal /proc/meminfo | awk '{print $2}')
 TOTAL_RAM_GB=$((TOTAL_RAM / 1024 / 1024))
 
-# Calculate swap size based on RAM
-if [ $TOTAL_RAM_GB -le 2 ]; then
-    SWAP_SIZE=4
-elif [ $TOTAL_RAM_GB -le 8 ]; then
-    SWAP_SIZE=8
-elif [ $TOTAL_RAM_GB -le 16 ]; then
-    SWAP_SIZE=16
-elif [ $TOTAL_RAM_GB -le 64 ]; then
-    SWAP_SIZE=16
-else
-    SWAP_SIZE=32
-fi
-
 # Calculate recommended swap size based on RAM
 if [ ${TOTAL_RAM_GB} -le 8 ]; then
     # For RAM ≤ 8GB, use equal swap size
     SWAP_SIZE=${TOTAL_RAM_GB}
-else
-    # For RAM > 8GB, use the original calculation
+elif [ ${TOTAL_RAM_GB} -le 64 ]; then
+    # For RAM between 8GB and 64GB, use half the RAM size
     SWAP_SIZE=$((TOTAL_RAM_GB / 2))
+else
+    # For RAM > 64GB, cap at 32GB swap
+    SWAP_SIZE=32
 fi
 
 # Set swappiness based on RAM size
@@ -152,38 +142,13 @@ else
     SWAPPINESS=60  # Higher swappiness for systems with less RAM
 fi
 
-# Inform user of automatic settings
-echo "Based on your RAM size (${TOTAL_RAM_GB}GB):"
-echo "- Swap size set to: ${SWAP_SIZE}GB"
-echo "- Swappiness set to: ${SWAPPINESS}"
-
-# Ask if user wants to override these settings
-read -p "Do you want to override these settings? (y/N): " override
-
-if [ "${override,,}" = "y" ]; then
-    # Allow manual input for swap size
-    read -p "Enter desired swap size in GB: " input_swap_size
-    if [ -n "$input_swap_size" ]; then
-        SWAP_SIZE=$input_swap_size
-    fi
-    
-    # Allow manual input for swappiness
-    read -p "Enter desired swappiness value (10-60): " input_swappiness
-    if [ -n "$input_swappiness" ]; then
-        SWAPPINESS=$input_swappiness
-    fi
-    
-    echo "Updated settings:"
-    echo "- Swap size: ${SWAP_SIZE}GB"
-    echo "- Swappiness: ${SWAPPINESS}"
-fi
-
 # Show installation plan
 echo "==========================="
 echo "Installation Plan:"
 echo "Device: ${DEVICE}"
 echo "EFI: ${EFI_PART}"
 echo "Swap: ${SWAP_PART}"
+echo "Swappiness: ${SWAPPINESS}"
 echo "Root: ${ROOT_PART}"
 echo "Username: ${USERNAME}"
 echo "Hostname: ${HOSTNAME}"
