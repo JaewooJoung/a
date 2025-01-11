@@ -4,13 +4,13 @@
 set -e
 
 # Default configuration
-declare -x use_default="--noconfirm"
-declare -x getAur="yay"
-declare -x myShell="zsh"
-declare -x grubtheme="Retroboot"
-declare -x sddmtheme="Candy"
-declare -x hydeTheme="Nordic Blue"
-declare -x hydeThemeRepo="https://github.com/HyDE-Project/hyde-themes/tree/Nordic-Blue"
+declare -x USE_DEFAULT="--noconfirm"
+declare -x AUR_HELPER="yay"
+declare -x MY_SHELL="zsh"
+declare -x GRUB_THEME="Retroboot"
+declare -x SDDM_THEME="Candy"
+declare -x HYDE_THEME="Nordic Blue"
+declare -x HYDE_THEME_REPO="https://github.com/HyDE-Project/hyde-themes/tree/Nordic-Blue"
 
 # Advanced settings
 declare -x BACKUP_RETENTION_DAYS=30
@@ -21,14 +21,14 @@ declare -x ENABLE_DEBUG=false
 declare -x LOG_FILE="$HOME/.cache/hyde/install.log"
 
 # Global variables
-declare scrDir
-scrDir="$(dirname "$(realpath "${BASH_SOURCE[0]}")")"
-declare -x confDir="${XDG_CONFIG_HOME:-$HOME/.config}"
-declare -x cacheDir="$HOME/.cache/hyde"
-declare -x cloneDir
-cloneDir="$(dirname "${scrDir}")"
-declare -a aurList=(yay paru)
-declare -a shlList=(zsh fish)
+declare SCRIPT_DIR
+SCRIPT_DIR="$(dirname "$(realpath "${BASH_SOURCE[0]}")")"
+declare -x CONFIG_DIR="${XDG_CONFIG_HOME:-$HOME/.config}"
+declare -x CACHE_DIR="$HOME/.cache/hyde"
+declare -x CLONE_DIR
+CLONE_DIR="$(dirname "${SCRIPT_DIR}")"
+declare -a AUR_LIST=(yay paru)
+declare -a SHELL_LIST=(zsh fish)
 
 # Logging function
 log() {
@@ -57,20 +57,6 @@ error_exit() {
     exit 1
 }
 
-# Cleanup function for old backups
-cleanup_old_backups() {
-    log "INFO" "Cleaning up old backups older than ${BACKUP_RETENTION_DAYS} days"
-    local backup_dir="${HOME}/.config/cfg_backups"
-    
-    if [ ! -d "${backup_dir}" ]; then
-        log "WARN" "Backup directory does not exist, skipping cleanup"
-        return 0
-    fi
-    
-    find "${backup_dir}" -type d -mtime "+${BACKUP_RETENTION_DAYS}" -exec rm -rf {} \; 2>/dev/null || 
-        log "WARN" "Some backups could not be removed"
-}
-
 # Check for sudo access
 check_sudo() {
     if ! sudo -v; then
@@ -80,8 +66,8 @@ check_sudo() {
 
 # Function to check if a package is installed
 pkg_installed() {
-    local PkgIn="$1"
-    if pacman -Qi "${PkgIn}" &> /dev/null; then
+    declare pkg_name="$1"
+    if pacman -Qi "${pkg_name}" &> /dev/null; then
         return 0
     else
         return 1
@@ -90,8 +76,8 @@ pkg_installed() {
 
 # Function to check if a package is available in the official repos
 pkg_available() {
-    local PkgIn="$1"
-    if pacman -Si "${PkgIn}" &> /dev/null; then
+    declare pkg_name="$1"
+    if pacman -Si "${pkg_name}" &> /dev/null; then
         return 0
     else
         return 1
@@ -100,19 +86,8 @@ pkg_available() {
 
 # Function to check if a package is available in the AUR
 aur_available() {
-    local PkgIn="$1"
-    if "${getAur}" -Si "${PkgIn}" &> /dev/null; then
-        return 0
-    else
-        return 1
-    fi
-}
-
-# Function to detect NVIDIA GPU
-nvidia_detect() {
-    local -a dGPU
-    readarray -t dGPU < <(lspci -k | grep -E "(VGA|3D)" | awk -F ': ' '{print $NF}')
-    if grep -iq nvidia <<< "${dGPU[@]}"; then
+    declare pkg_name="$1"
+    if "${AUR_HELPER}" -Si "${pkg_name}" &> /dev/null; then
         return 0
     else
         return 1
@@ -121,136 +96,112 @@ nvidia_detect() {
 
 # Function to install packages from a list
 install_packages() {
-    local listPkg="$1"
-    local -a archPkg=()
-    local -a aurhPkg=()
-    local attempt=1
+    declare pkg_list="$1"
+    declare -a arch_packages=()
+    declare -a aur_packages=()
+    declare attempt=1
 
-    [ ! -f "${listPkg}" ] && error_exit "Package list ${listPkg} not found"
+    [ ! -f "${pkg_list}" ] && error_exit "Package list ${pkg_list} not found"
 
-    # Set parallel downloads
-    if [ -f "/etc/pacman.conf" ]; then
-        sudo sed -i "s/^#ParallelDownloads = .*$/ParallelDownloads = ${PARALLEL_DOWNLOADS}/" /etc/pacman.conf
-    fi
-
-    while read -r pkg deps; do
-        pkg="${pkg// /}"
-        [ -z "${pkg}" ] && continue
+    while read -r package deps; do
+        package="${package// /}"
+        [ -z "${package}" ] && continue
 
         if [ ! -z "${deps}" ]; then
             deps="${deps%"${deps##*[![:space:]]}"}"
-            while read -r cdep; do
-                if ! pkg_installed "${cdep}"; then
-                    log "WARN" "${pkg} is missing (${deps}) dependency..."
+            while read -r dependency; do
+                if ! pkg_installed "${dependency}"; then
+                    log "WARN" "${package} is missing (${deps}) dependency..."
                     continue 2
                 fi
             done < <(echo "${deps}" | xargs -n1)
         fi
 
-        if pkg_installed "${pkg}"; then
-            log "WARN" "${pkg} is already installed..."
-        elif pkg_available "${pkg}"; then
-            repo=$(pacman -Si "${pkg}" | awk -F ': ' '/Repository / {print $2}')
-            log "INFO" "queueing ${pkg} from official arch repo..."
-            archPkg+=("${pkg}")
-        elif aur_available "${pkg}"; then
-            log "INFO" "queueing ${pkg} from arch user repo..."
-            aurhPkg+=("${pkg}")
+        if pkg_installed "${package}"; then
+            log "WARN" "${package} is already installed..."
+        elif pkg_available "${package}"; then
+            repo=$(pacman -Si "${package}" | awk -F ': ' '/Repository / {print $2}')
+            log "INFO" "queueing ${package} from official arch repo..."
+            arch_packages+=("${package}")
+        elif aur_available "${package}"; then
+            log "INFO" "queueing ${package} from arch user repo..."
+            aur_packages+=("${package}")
         else
-            log "ERROR" "unknown package ${pkg}..."
+            log "ERROR" "unknown package ${package}..."
         fi
-    done < <(cut -d '#' -f 1 "${listPkg}")
+    done < <(cut -d '#' -f 1 "${pkg_list}")
 
-    while [ ${attempt} -le ${RETRY_ATTEMPTS} ]; do
-        if [[ ${#archPkg[@]} -gt 0 ]]; then
-            if sudo pacman ${use_default} -S "${archPkg[@]}"; then
-                break
-            else
-                log "WARN" "Package installation attempt ${attempt} failed, retrying..."
-                attempt=$((attempt + 1))
-                sleep 5
-            fi
-        fi
-    done
-    [ ${attempt} -gt ${RETRY_ATTEMPTS} ] && error_exit "Failed to install official packages after ${RETRY_ATTEMPTS} attempts"
+    if [[ ${#arch_packages[@]} -gt 0 ]]; then
+        sudo pacman ${USE_DEFAULT} -S "${arch_packages[@]}" || error_exit "Failed to install arch packages"
+    fi
 
-    attempt=1
-    while [ ${attempt} -le ${RETRY_ATTEMPTS} ]; do
-        if [[ ${#aurhPkg[@]} -gt 0 ]]; then
-            if "${getAur}" ${use_default} -S "${aurhPkg[@]}"; then
-                break
-            else
-                log "WARN" "AUR package installation attempt ${attempt} failed, retrying..."
-                attempt=$((attempt + 1))
-                sleep 5
-            fi
-        fi
-    done
-    [ ${attempt} -gt ${RETRY_ATTEMPTS} ] && error_exit "Failed to install AUR packages after ${RETRY_ATTEMPTS} attempts"
+    if [[ ${#aur_packages[@]} -gt 0 ]]; then
+        "${AUR_HELPER}" ${USE_DEFAULT} -S "${aur_packages[@]}" || error_exit "Failed to install AUR packages"
+    fi
 }
 
 # Function to restore configurations
 restore_configs() {
-    local CfgLst="$1"
-    local CfgDir="$2"
-    local ThemeOverride="$3"
+    declare cfg_list="$1"
+    declare cfg_dir="$2"
+    declare theme_override="$3"
 
-    [ ! -f "${CfgLst}" ] && error_exit "Configuration list ${CfgLst} not found"
-    [ ! -d "${CfgDir}" ] && error_exit "Configuration directory ${CfgDir} not found"
+    [ ! -f "${cfg_list}" ] && error_exit "Configuration list ${cfg_list} not found"
+    [ ! -d "${cfg_dir}" ] && error_exit "Configuration directory ${cfg_dir} not found"
 
-    local BkpDir="${HOME}/.config/cfg_backups/$(date +'%Y%m%d_%H%M%S')${ThemeOverride}"
-    mkdir -p "${BkpDir}" || error_exit "Failed to create backup directory"
+    declare backup_dir="${HOME}/.config/cfg_backups/$(date +'%Y%m%d_%H%M%S')${theme_override}"
+    mkdir -p "${backup_dir}" || error_exit "Failed to create backup directory"
 
     while read -r line; do
         declare overwrite
         declare backup_flag
-        declare config_path
+        declare path
         declare config_file
         declare package
         
         overwrite="$(echo "${line}" | awk -F '|' '{print $1}')"
         backup_flag="$(echo "${line}" | awk -F '|' '{print $2}')"
-        config_path="$(eval echo "$(echo "${line}" | awk -F '|' '{print $3}')")"
+        path="$(eval echo "$(echo "${line}" | awk -F '|' '{print $3}')")"
         config_file="$(echo "${line}" | awk -F '|' '{print $4}')"
         package="$(echo "${line}" | awk -F '|' '{print $5}')"
 
         while read -r pkg_check; do
             if ! pkg_installed "${pkg_check}"; then
-                log "WARN" "${config_path}/${config_file} as dependency ${pkg_check} is not installed..."
+                log "WARN" "${path}/${config_file} as dependency ${pkg_check} is not installed..."
                 continue 2
             fi
         done < <(echo "${package}" | xargs -n 1)
 
-        echo "${config_file}" | xargs -n 1 | while read -r config_check; do
-            [ -z "${config_path}" ] && continue
+        echo "${config_file}" | xargs -n 1 | while read -r config_name; do
+            [ -z "${path}" ] && continue
             declare target_path
-            target_path="$(echo "${config_path}" | sed "s+^${HOME}++g")"
+            target_path="$(echo "${path}" | sed "s+^${HOME}++g")"
 
-            if { [ -d "${config_path}/${config_check}" ] || [ -f "${config_path}/${config_check}" ]; } && [ "${backup_flag}" = "Y" ]; then
-                mkdir -p "${BkpDir}${target_path}" || error_exit "Failed to create backup subdirectory"
+            if { [ -d "${path}/${config_name}" ] || [ -f "${path}/${config_name}" ]; } && [ "${backup_flag}" = "Y" ]; then
+                mkdir -p "${backup_dir}${target_path}" || error_exit "Failed to create backup subdirectory"
                 if [ "${overwrite}" = "Y" ]; then
-                    mv "${config_path}/${config_check}" "${BkpDir}${target_path}" || error_exit "Failed to move config for backup"
+                    mv "${path}/${config_name}" "${backup_dir}${target_path}" || error_exit "Failed to move config for backup"
                 else
-                    cp -r "${config_path}/${config_check}" "${BkpDir}${target_path}" || error_exit "Failed to copy config for backup"
+                    cp -r "${path}/${config_name}" "${backup_dir}${target_path}" || error_exit "Failed to copy config for backup"
                 fi
-                log "INFO" "Backed up ${config_path}/${config_check} to ${BkpDir}${target_path}"
+                log "INFO" "Backed up ${path}/${config_name} to ${backup_dir}${target_path}"
             fi
 
-            if [ ! -d "${config_path}" ]; then
-                mkdir -p "${config_path}" || error_exit "Failed to create config directory"
+            if [ ! -d "${path}" ]; then
+                mkdir -p "${path}" || error_exit "Failed to create config directory"
             fi
 
-            if [ ! -f "${config_path}/${config_check}" ]; then
-                cp -r "${CfgDir}${target_path}/${config_check}" "${config_path}" || error_exit "Failed to restore config"
-                log "INFO" "Restored ${CfgDir}${target_path}/${config_check} to ${config_path}"
+            if [ ! -f "${path}/${config_name}" ]; then
+                cp -r "${cfg_dir}${target_path}/${config_name}" "${path}" || error_exit "Failed to restore config"
+                log "INFO" "Restored ${cfg_dir}${target_path}/${config_name} to ${path}"
             elif [ "${overwrite}" = "Y" ]; then
-                cp -r "${CfgDir}${target_path}/${config_check}" "${config_path}" || error_exit "Failed to overwrite config"
-                log "INFO" "Overwrote ${config_path} with ${CfgDir}${target_path}/${config_check}"
+                cp -r "${cfg_dir}${target_path}/${config_name}" "${path}" || error_exit "Failed to overwrite config"
+                log "INFO" "Overwrote ${path} with ${cfg_dir}${target_path}/${config_name}"
             else
-                log "WARN" "Preserving user setting at ${config_path}/${config_check}"
+                log "WARN" "Preserving user setting at ${path}/${config_name}"
             fi
         done
-    done < "${CfgLst}"
+    done < "${cfg_list}"
 }
 
 # Function to restore fonts
@@ -277,9 +228,9 @@ restore_fonts() {
             log "INFO" "Created ${target_dir} directory"
         fi
 
-        sudo tar -xzf "${cloneDir}/Source/arcs/${font_name}.tar.gz" -C "${target_dir}/" || error_exit "Failed to extract fonts"
+        sudo tar -xzf "${CLONE_DIR}/Source/arcs/${font_name}.tar.gz" -C "${target_dir}/" || error_exit "Failed to extract fonts"
         log "INFO" "Extracted ${font_name}.tar.gz to ${target_dir}"
-    done < "${scrDir}/restorefnt.lst"
+    done < "${SCRIPT_DIR}/restorefnt.lst"
 
     log "INFO" "Rebuilding font cache..."
     fc-cache -f || error_exit "Failed to rebuild font cache"
@@ -287,44 +238,44 @@ restore_fonts() {
 
 # Function to apply the selected theme
 apply_theme() {
-    local themeName="$1"
-    local themeRepo="$2"
+    declare theme_name="$1"
+    declare theme_repo="$2"
 
-    log "INFO" "APPLYING THEME ${themeName}"
+    log "INFO" "APPLYING THEME ${theme_name}"
 
-    local themeDir="${cacheDir}/themepatcher/${themeName}"
-    if [ -d "${themeDir}" ]; then
+    declare theme_dir="${CACHE_DIR}/themepatcher/${theme_name}"
+    if [ -d "${theme_dir}" ]; then
         log "WARN" "Theme directory exists. Updating..."
-        cd "${themeDir}" && git pull || error_exit "Failed to update theme"
+        cd "${theme_dir}" && git pull || error_exit "Failed to update theme"
     else
         log "INFO" "Cloning theme repository..."
-        git clone -b "${themeName}" "${themeRepo}" "${themeDir}" || error_exit "Failed to clone theme"
+        git clone -b "${theme_name}" "${theme_repo}" "${theme_dir}" || error_exit "Failed to clone theme"
     fi
 
-    if [ -d "${themeDir}/Configs/.config/hyde/themes/${themeName}" ]; then
+    if [ -d "${theme_dir}/Configs/.config/hyde/themes/${theme_name}" ]; then
         log "INFO" "Applying theme configurations..."
-        mkdir -p "${confDir}/hyde/themes/" || error_exit "Failed to create theme directory"
-        cp -r "${themeDir}/Configs/.config/hyde/themes/${themeName}" "${confDir}/hyde/themes/" || error_exit "Failed to copy theme"
+        mkdir -p "${CONFIG_DIR}/hyde/themes/" || error_exit "Failed to create theme directory"
+        cp -r "${theme_dir}/Configs/.config/hyde/themes/${theme_name}" "${CONFIG_DIR}/hyde/themes/" || error_exit "Failed to copy theme"
     else
         error_exit "Theme directory not found in repository"
     fi
 
-    log "INFO" "Theme ${themeName} applied successfully"
+    log "INFO" "Theme ${theme_name} applied successfully"
 }
 
 # Function to enable system services
 enable_services() {
     log "INFO" "ENABLING SERVICES"
 
-    while read -r servChk; do
-        if [[ $(systemctl list-units --all -t service --full --no-legend "${servChk}.service" | sed 's/^\s*//g' | cut -f1 -d' ') == "${servChk}.service" ]]; then
-            log "WARN" "${servChk} service is already active"
+    while read -r service_name; do
+        if [[ $(systemctl list-units --all -t service --full --no-legend "${service_name}.service" | sed 's/^\s*//g' | cut -f1 -d' ') == "${service_name}.service" ]]; then
+            log "WARN" "${service_name} service is already active"
         else
-            log "INFO" "Starting ${servChk} system service..."
-            sudo systemctl enable "${servChk}.service" || error_exit "Failed to enable ${servChk} service"
-            sudo systemctl start "${servChk}.service" || error_exit "Failed to start ${servChk} service"
+            log "INFO" "Starting ${service_name} system service..."
+            sudo systemctl enable "${service_name}.service" || error_exit "Failed to enable ${service_name} service"
+            sudo systemctl start "${service_name}.service" || error_exit "Failed to start ${service_name} service"
         fi
-    done < "${scrDir}/systemctl.lst"
+    done < "${SCRIPT_DIR}/systemctl.lst"
 }
 
 # Main installation process
@@ -343,59 +294,29 @@ main() {
     check_sudo
 
     # Verify required files exist
-    [ ! -f "${scrDir}/custom_hypr.lst" ] && error_exit "Required package list not found"
-    [ ! -f "${scrDir}/restore_cfg.lst" ] && error_exit "Required config list not found"
-    [ ! -f "${scrDir}/restorefnt.lst" ] && error_exit "Required font list not found"
-    [ ! -f "${scrDir}/systemctl.lst" ] && error_exit "Required service list not found"
+    [ ! -f "${SCRIPT_DIR}/custom_hypr.lst" ] && error_exit "Required package list not found"
+    [ ! -f "${SCRIPT_DIR}/restore_cfg.lst" ] && error_exit "Required config list not found"
+    [ ! -f "${SCRIPT_DIR}/restorefnt.lst" ] && error_exit "Required font list not found"
+    [ ! -f "${SCRIPT_DIR}/systemctl.lst" ] && error_exit "Required service list not found"
 
     # Create necessary directories
-    mkdir -p "${confDir}" || error_exit "Failed to create config directory"
-    mkdir -p "${cacheDir}" || error_exit "Failed to create cache directory"
-
-    # Cleanup old backups before starting
-    cleanup_old_backups
-
-    # Handle timeout for the entire process
-    (
-        sleep "${TIMEOUT_SECONDS}"
-        kill -0 $ 2>/dev/null && {
-            log "ERROR" "Installation timed out after ${TIMEOUT_SECONDS} seconds"
-            kill -15 $ 2>/dev/null || kill -9 $ 2>/dev/null
-        }
-    ) &
-    timeout_pid=$!
+    mkdir -p "${CONFIG_DIR}" || error_exit "Failed to create config directory"
+    mkdir -p "${CACHE_DIR}" || error_exit "Failed to create cache directory"
 
     # Install packages
-    local attempt=1
-    while [ ${attempt} -le ${RETRY_ATTEMPTS} ]; do
-        if install_packages "${scrDir}/custom_hypr.lst"; then
-            break
-        else
-            log "WARN" "Installation attempt ${attempt} failed, retrying..."
-            attempt=$((attempt + 1))
-            sleep 5
-        fi
-    done
-
-    if [ ${attempt} -gt ${RETRY_ATTEMPTS} ]; then
-        log "ERROR" "Installation failed after ${RETRY_ATTEMPTS} attempts"
-        exit 1
-    fi
+    install_packages "${SCRIPT_DIR}/custom_hypr.lst"
 
     # Restore configurations
-    restore_configs "${scrDir}/restore_cfg.lst" "${cloneDir}/Configs" ""
+    restore_configs "${SCRIPT_DIR}/restore_cfg.lst" "${CLONE_DIR}/Configs" ""
 
     # Restore fonts
     restore_fonts
 
     # Apply the selected theme
-    apply_theme "${hydeTheme}" "${hydeThemeRepo}"
+    apply_theme "${HYDE_THEME}" "${HYDE_THEME_REPO}"
 
     # Enable system services
     enable_services
-
-    # Cleanup timeout monitor
-    kill "${timeout_pid}" 2>/dev/null
 
     log "INFO" "INSTALLATION COMPLETE"
     return 0
@@ -403,14 +324,14 @@ main() {
 
 # Trap for cleanup on script exit
 cleanup() {
-    local exit_code=$?
+    declare exit_code=$?
     
     # Kill any remaining background processes
     jobs -p | xargs -r kill 2>/dev/null
     
     # Cleanup temporary files if they exist
-    if [ -n "${cacheDir}" ] && [ -d "${cacheDir}/temp" ]; then
-        rm -rf "${cacheDir}/temp"
+    if [ -n "${CACHE_DIR}" ] && [ -d "${CACHE_DIR}/temp" ]; then
+        rm -rf "${CACHE_DIR}/temp"
     fi
     
     if [ ${exit_code} -ne 0 ]; then
