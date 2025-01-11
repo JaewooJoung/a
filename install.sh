@@ -284,7 +284,8 @@ if [[ $DM_SERVICE != "none" ]]; then
     arch-chroot /mnt systemctl enable ${DM_SERVICE}
 fi
 
-# 여기 에서 뺌 
+# Network enable
+arch-chroot /mnt systemctl enable NetworkManager
 
 # System configuration
 arch-chroot /mnt /bin/bash <<CHROOT_COMMANDS
