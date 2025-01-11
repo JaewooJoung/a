@@ -201,53 +201,53 @@ restore_configs() {
     local BkpDir="${HOME}/.config/cfg_backups/$(date +'%Y%m%d_%H%M%S')${ThemeOverride}"
     mkdir -p "${BkpDir}" || error_exit "Failed to create backup directory"
 
-    while read -r lst; do
-        local ovrWrte
-        local bkpFlag
-        local pth
-        local cfg
-        local pkg
+    while read -r line; do
+        declare overwrite
+        declare backup_flag
+        declare config_path
+        declare config_file
+        declare package
         
-        ovrWrte="$(echo "${lst}" | awk -F '|' '{print $1}')"
-        bkpFlag="$(echo "${lst}" | awk -F '|' '{print $2}')"
-        pth="$(eval echo "$(echo "${lst}" | awk -F '|' '{print $3}')")"
-        cfg="$(echo "${lst}" | awk -F '|' '{print $4}')"
-        pkg="$(echo "${lst}" | awk -F '|' '{print $5}')"
+        overwrite="$(echo "${line}" | awk -F '|' '{print $1}')"
+        backup_flag="$(echo "${line}" | awk -F '|' '{print $2}')"
+        config_path="$(eval echo "$(echo "${line}" | awk -F '|' '{print $3}')")"
+        config_file="$(echo "${line}" | awk -F '|' '{print $4}')"
+        package="$(echo "${line}" | awk -F '|' '{print $5}')"
 
-        while read -r pkg_chk; do
-            if ! pkg_installed "${pkg_chk}"; then
-                log "WARN" "${pth}/${cfg} as dependency ${pkg_chk} is not installed..."
+        while read -r pkg_check; do
+            if ! pkg_installed "${pkg_check}"; then
+                log "WARN" "${config_path}/${config_file} as dependency ${pkg_check} is not installed..."
                 continue 2
             fi
-        done < <(echo "${pkg}" | xargs -n 1)
+        done < <(echo "${package}" | xargs -n 1)
 
-        echo "${cfg}" | xargs -n 1 | while read -r cfg_chk; do
-            [ -z "${pth}" ] && continue
-            local tgt
-            tgt="$(echo "${pth}" | sed "s+^${HOME}++g")"
+        echo "${config_file}" | xargs -n 1 | while read -r config_check; do
+            [ -z "${config_path}" ] && continue
+            declare target_path
+            target_path="$(echo "${config_path}" | sed "s+^${HOME}++g")"
 
-            if { [ -d "${pth}/${cfg_chk}" ] || [ -f "${pth}/${cfg_chk}" ]; } && [ "${bkpFlag}" = "Y" ]; then
-                mkdir -p "${BkpDir}${tgt}" || error_exit "Failed to create backup subdirectory"
-                if [ "${ovrWrte}" = "Y" ]; then
-                    mv "${pth}/${cfg_chk}" "${BkpDir}${tgt}" || error_exit "Failed to move config for backup"
+            if { [ -d "${config_path}/${config_check}" ] || [ -f "${config_path}/${config_check}" ]; } && [ "${backup_flag}" = "Y" ]; then
+                mkdir -p "${BkpDir}${target_path}" || error_exit "Failed to create backup subdirectory"
+                if [ "${overwrite}" = "Y" ]; then
+                    mv "${config_path}/${config_check}" "${BkpDir}${target_path}" || error_exit "Failed to move config for backup"
                 else
-                    cp -r "${pth}/${cfg_chk}" "${BkpDir}${tgt}" || error_exit "Failed to copy config for backup"
+                    cp -r "${config_path}/${config_check}" "${BkpDir}${target_path}" || error_exit "Failed to copy config for backup"
                 fi
-                log "INFO" "Backed up ${pth}/${cfg_chk} to ${BkpDir}${tgt}"
+                log "INFO" "Backed up ${config_path}/${config_check} to ${BkpDir}${target_path}"
             fi
 
-            if [ ! -d "${pth}" ]; then
-                mkdir -p "${pth}" || error_exit "Failed to create config directory"
+            if [ ! -d "${config_path}" ]; then
+                mkdir -p "${config_path}" || error_exit "Failed to create config directory"
             fi
 
-            if [ ! -f "${pth}/${cfg_chk}" ]; then
-                cp -r "${CfgDir}${tgt}/${cfg_chk}" "${pth}" || error_exit "Failed to restore config"
-                log "INFO" "Restored ${CfgDir}${tgt}/${cfg_chk} to ${pth}"
-            elif [ "${ovrWrte}" = "Y" ]; then
-                cp -r "${CfgDir}${tgt}/${cfg_chk}" "${pth}" || error_exit "Failed to overwrite config"
-                log "INFO" "Overwrote ${pth} with ${CfgDir}${tgt}/${cfg_chk}"
+            if [ ! -f "${config_path}/${config_check}" ]; then
+                cp -r "${CfgDir}${target_path}/${config_check}" "${config_path}" || error_exit "Failed to restore config"
+                log "INFO" "Restored ${CfgDir}${target_path}/${config_check} to ${config_path}"
+            elif [ "${overwrite}" = "Y" ]; then
+                cp -r "${CfgDir}${target_path}/${config_check}" "${config_path}" || error_exit "Failed to overwrite config"
+                log "INFO" "Overwrote ${config_path} with ${CfgDir}${target_path}/${config_check}"
             else
-                log "WARN" "Preserving user setting at ${pth}/${cfg_chk}"
+                log "WARN" "Preserving user setting at ${config_path}/${config_check}"
             fi
         done
     done < "${CfgLst}"
@@ -257,28 +257,28 @@ restore_configs() {
 restore_fonts() {
     log "INFO" "RESTORING FONTS"
 
-    while read -r lst; do
-        local fnt
-        local tgt
+    while read -r line; do
+        declare font_name
+        declare target_dir
         
-        fnt="$(echo "$lst" | awk -F '|' '{print $1}')"
-        tgt="$(eval echo "$(echo "$lst" | awk -F '|' '{print $2}')")"
+        font_name="$(echo "${line}" | awk -F '|' '{print $1}')"
+        target_dir="$(eval echo "$(echo "${line}" | awk -F '|' '{print $2}')")"
 
-        if [[ "${tgt}" =~ /usr/share/ && -d /run/current-system/sw/share/ ]]; then
-            log "WARN" "Skipping ${tgt} on NixOS"
+        if [[ "${target_dir}" =~ /usr/share/ && -d /run/current-system/sw/share/ ]]; then
+            log "WARN" "Skipping ${target_dir} on NixOS"
             continue
         fi
 
-        if [ ! -d "${tgt}" ]; then
-            if ! mkdir -p "${tgt}" 2>/dev/null; then
+        if [ ! -d "${target_dir}" ]; then
+            if ! mkdir -p "${target_dir}" 2>/dev/null; then
                 log "INFO" "Creating the directory as root instead..."
-                sudo mkdir -p "${tgt}" || error_exit "Failed to create font directory"
+                sudo mkdir -p "${target_dir}" || error_exit "Failed to create font directory"
             fi
-            log "INFO" "Created ${tgt} directory"
+            log "INFO" "Created ${target_dir} directory"
         fi
 
-        sudo tar -xzf "${cloneDir}/Source/arcs/${fnt}.tar.gz" -C "${tgt}/" || error_exit "Failed to extract fonts"
-        log "INFO" "Extracted ${fnt}.tar.gz to ${tgt}"
+        sudo tar -xzf "${cloneDir}/Source/arcs/${font_name}.tar.gz" -C "${target_dir}/" || error_exit "Failed to extract fonts"
+        log "INFO" "Extracted ${font_name}.tar.gz to ${target_dir}"
     done < "${scrDir}/restorefnt.lst"
 
     log "INFO" "Rebuilding font cache..."
