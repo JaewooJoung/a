@@ -3,7 +3,7 @@
 ## 먼저 ISO 를 받아야 합니다. 
 여기서 먼저 받으세요 ➡️  [https://archlinux.org/download/](https://archlinux.org/download/)
 윈도우🪟 유저라면 부팅 USB 를 만드세요 ➡️  [https://rufus.ie/ko/](https://rufus.ie/ko/)
-리눅스 유저라면 다 아실꺼고 맥유저는 🤭.. 
+리눅스 유저라면 다 아실꺼고 맥유저는 그냥 맥쓰시면 됩니다... 
 
 ## Arch Linux 설치 가이드
 
