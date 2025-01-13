@@ -22,7 +22,7 @@ station wlan0 connect [WIFI이름]
 
 ### 2. 설치 스크립트 다운로드 및 실행
 
-다음 명령어를 실행하여 설치 스크립트를 다운로드합니다:
+다음 명령어를 실행하여 설치 스크립트를 다운로드 하면서 실행까지 합니다:
 ```bash
 curl -O https://jaewoojoung.github.io/a/install.sh && chmod +x install.sh && bash install.sh
 ```
