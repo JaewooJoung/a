@@ -377,13 +377,13 @@ pacman -S --noconfirm \
     noto-fonts-cjk noto-fonts-emoji \
     adobe-source-han-sans-kr-fonts adobe-source-han-serif-kr-fonts ttf-baekmuk \
     powerline-fonts nerd-fonts ttf-lato \
-    libhangul fcitx5 fcitx5-configtool fcitx5-hangul fcitx5-gtk fcitx5-qt
+    libhangul fcitx5 fcitx5-configtool fcitx5-hangul fcitx5-gtk fcitx5-qt \
+    libreoffice-fresh libreoffice-fresh-ko
 
 # 프로그래밍 언어 및 도구
 pacman -S --noconfirm \
     firefox thunderbird thunderbird-i18n-ko \
-    libreoffice-fresh libreoffice-fresh-ko \
-    flatpak remmina opentofu chromium \
+    flatpak remmina opentofu chromium code \
     describeimage fortunecraft llm-manager ollama ollama-docs ghostty
 
 # Configure fcitx5
