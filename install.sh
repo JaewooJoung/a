@@ -197,13 +197,13 @@ sleep 3
 clear
 # Desktop environment selection
 echo "Select your desktop environment:"
-echo "1) KDE Plasma"
-echo "2) GNOME"
-echo "3) XFCE"
-echo "4) Awesome WM"
-echo "5) DWM"
-echo "6) Cinnamon"
-echo "7) Hyprland"
+echo "1) KDE Plasma (verified)"
+echo "2) GNOME (verified)"
+echo "3) XFCE (verified)"
+echo "4) Awesome WM (for experts only)"
+echo "5) DWM (for experts only)"
+echo "6) Cinnamon (verified)"
+echo "7) Hyprland (for experts only)"
 read -p "Enter your choice (1-7): " de_choice
 
 case $de_choice in
