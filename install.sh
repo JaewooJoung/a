@@ -389,16 +389,6 @@ pacman -S --noconfirm \
     gnuplot \
     cmake gcc-fortran libwhich llvm-julia patchelf python
 
-# Configure fcitx5
-mkdir -p /home/${USERNAME}/.config/fcitx5/conf
-mkdir -p /home/${USERNAME}/.config/environment.d
-
-# Set environment variables for fcitx5
-cat > /home/${USERNAME}/.config/environment.d/fcitx5.conf <<EOF
-GTK_IM_MODULE=fcitx
-QT_IM_MODULE=fcitx
-XMODIFIERS=@im=fcitx
-EOF
 
 # Configure fcitx5 profile for Korean input
 cat > /home/${USERNAME}/.config/fcitx5/profile <<EOF
@@ -419,9 +409,25 @@ Layout=kr
 0=Default
 EOF
 
-# Set ownership of the config files to the user
-chown -R ${USERNAME}:${USERNAME} /home/${USERNAME}/.config
+# Set environment variables for fcitx5
+mkdir -p /home/${USERNAME}/.config/environment.d
+cat > /home/${USERNAME}/.config/environment.d/fcitx5.conf <<EOF
+GTK_IM_MODULE=fcitx
+QT_IM_MODULE=fcitx
+XMODIFIERS=@im=fcitx
+EOF
 
+# Add fcitx5 to autostart
+mkdir -p /home/${USERNAME}/.config/autostart
+cat > /home/${USERNAME}/.config/autostart/fcitx5.desktop <<EOF
+[Desktop Entry]
+Type=Application
+Name=Fcitx5
+Exec=fcitx5
+Comment=Start Fcitx5 input method
+EOF
+
+# Set ownership of the config files to the user
 chown -R ${USERNAME}:${USERNAME} /home/${USERNAME}/.config
 echo "vm.swappiness=${SWAPPINESS}" > /etc/sysctl.d/99-swappiness.conf
 # Generate initramfs
