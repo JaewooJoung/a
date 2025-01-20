@@ -404,11 +404,11 @@ DefaultIM=hangul
 
 [Groups/0/Items/0]
 Name=keyboard-us
-Layout=
+Layout=us
 
 [Groups/0/Items/1]
 Name=hangul
-Layout=
+Layout=kr
 
 [GroupOrder]
 0=Default
