@@ -376,7 +376,7 @@ pacman -S --noconfirm \
     noto-fonts-cjk noto-fonts-emoji \
     adobe-source-han-sans-kr-fonts adobe-source-han-serif-kr-fonts ttf-baekmuk \
     powerline-fonts nerd-fonts ttf-lato \
-    kime kime-git
+    kime
 
 # 프로그래밍 언어 및 도구
 pacman -S --noconfirm \
@@ -397,9 +397,6 @@ global_shortcut:
   toggle: Alt+R
 EOF
 
-# Set ownership of the config files to the user
-chown -R ${USERNAME}:${USERNAME} /home/${USERNAME}/.config
-
 # Set environment variables for kime
 cat > /home/${USERNAME}/.config/environment.d/kime.conf <<EOF
 GTK_IM_MODULE=kime
@@ -407,8 +404,21 @@ QT_IM_MODULE=kime
 XMODIFIERS=@im=kime
 EOF
 
-# Enable kime for the user
-arch-chroot /mnt su - ${USERNAME} -c "kime-start"
+# Set ownership of the config files to the user
+chown -R ${USERNAME}:${USERNAME} /home/${USERNAME}/.config
+
+# Add kime to autostart
+mkdir -p /home/${USERNAME}/.config/autostart
+cat > /home/${USERNAME}/.config/autostart/kime.desktop <<EOF
+[Desktop Entry]
+Type=Application
+Name=kime
+Exec=kime
+Comment=Start kime input method
+EOF
+
+# Set ownership of the autostart file
+chown -R ${USERNAME}:${USERNAME} /home/${USERNAME}/.config/autostart
 
 # Set swappiness
 echo "vm.swappiness=${SWAPPINESS}" > /etc/sysctl.d/99-swappiness.conf
