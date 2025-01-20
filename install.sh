@@ -393,12 +393,14 @@ pacman -S --noconfirm \
 mkdir -p /home/${USERNAME}/.config/fcitx5/conf
 mkdir -p /home/${USERNAME}/.config/environment.d
 
+# Set environment variables for fcitx5
 cat > /home/${USERNAME}/.config/environment.d/fcitx5.conf <<EOF
 GTK_IM_MODULE=fcitx
 QT_IM_MODULE=fcitx
 XMODIFIERS=@im=fcitx
 EOF
 
+# Configure fcitx5 profile for Korean input
 cat > /home/${USERNAME}/.config/fcitx5/profile <<EOF
 [Groups/0]
 Name=Default
@@ -416,6 +418,9 @@ Layout=kr
 [GroupOrder]
 0=Default
 EOF
+
+# Set ownership of the config files to the user
+chown -R ${USERNAME}:${USERNAME} /home/${USERNAME}/.config
 
 chown -R ${USERNAME}:${USERNAME} /home/${USERNAME}/.config
 echo "vm.swappiness=${SWAPPINESS}" > /etc/sysctl.d/99-swappiness.conf
