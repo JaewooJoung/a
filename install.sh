@@ -384,7 +384,10 @@ pacman -S --noconfirm \
 pacman -S --noconfirm \
     firefox thunderbird thunderbird-i18n-ko \
     flatpak remmina opentofu chromium code \
-    describeimage fortunecraft llm-manager ollama ollama-docs ghostty
+    describeimage fortunecraft llm-manager ollama ollama-docs ghostty \
+    7zip blas64-openblas fftw libblastrampoline libgit2 libunwind libutf8proc lld llvm-julia-libs mbedtls2 openlibm pcre2 suitesparse \
+    gnuplot \
+    cmake gcc-fortran libwhich llvm-julia patchelf python
 
 # Configure fcitx5
 mkdir -p /home/${USERNAME}/.config/fcitx5/conf
