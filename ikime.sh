@@ -85,4 +85,6 @@ EOL
 kime &
 echo "kime installation and configuration complete!"
 
+curl -fsSL https://install.julialang.org | sh
+
 
