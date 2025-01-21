@@ -94,4 +94,6 @@ chmod +x julia_install.sh
 # Run it
 ./julia_install.sh
 
+echo "julia installation and configuration complete!"
+
 
