@@ -25,11 +25,13 @@ echo "yay installation complete!"
 # Create a temporary directory for building
 mkdir -p ~/aur_builds
 cd ~/aur_builds
-
+cd ..
 # Clone the AUR package
-git clone https://aur.archlinux.org/kime.git
+cd ~/다운로드
+git clone https://github.com/Riey/kime
 cd kime
 
+scripts/build.sh -ar
 # Build and install the package
 makepkg -si --noconfirm
 
