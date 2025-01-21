@@ -9,7 +9,10 @@ sudo pacman -Syu --noconfirm
 
 # 필요한 종속성 설치
 echo "Installing dependencies..."
-sudo pacman -S --needed --noconfirm git base-devel gcc clang cmake pkg-config gtk3 gtk4 qt5-base qt6-base libxcb libdbus fontconfig freetype2 libxkbcommon wayland
+sudo pacman -S --needed --noconfirm \
+    git base-devel gcc clang cmake pkg-config \
+    gtk3 gtk4 qt5-base qt6-base libxcb libdbus fontconfig freetype2 libxkbcommon wayland \
+    noto-fonts-cjk cairo cargo dbus llvm
 
 # Rust 설치
 echo "Installing Rust..."
