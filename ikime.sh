@@ -3,8 +3,19 @@
 # Update the system
 sudo pacman -Syu --noconfirm
 
-# Install kime from AUR
-yay -S --noconfirm kime
+# Install base-devel if not already installed
+sudo pacman -S --noconfirm base-devel git
+
+# Create a temporary directory for building
+mkdir -p ~/aur_builds
+cd ~/aur_builds
+
+# Clone the AUR package
+git clone https://aur.archlinux.org/kime.git
+cd kime
+
+# Build and install the package
+makepkg -si --noconfirm
 
 # Create config directory
 mkdir -p ~/.config/kime
@@ -53,6 +64,10 @@ Name=kime
 Comment[en_US]=Korean Input Method Editor
 Comment=Korean Input Method Editor
 EOL
+
+# Clean up build directory
+cd ~
+rm -rf ~/aur_builds
 
 # Start kime immediately
 kime &
