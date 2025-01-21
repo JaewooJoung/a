@@ -1,12 +1,13 @@
 #!/bin/bash
-
 # Update the system
 sudo pacman -Syu --noconfirm
 
 # Install necessary dependencies
-sudo pacman -S --needed --noconfirm \
-git base-devel gcc clang cmake pkg-config gtk3 gtk4 qt5-base qt6-base \
-libxcb libdbus fontconfig freetype2 libxkbcommon
+sudo pacman -S --needed --noconfirm git base-devel gcc clang cmake pkg-config gtk3 gtk4 qt5-base qt6-base libxcb libdbus fontconfig freetype2 libxkbcommon
+
+# Install Rust
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+source "$HOME/.cargo/env"
 
 # Create a temporary directory and navigate into it
 cd /tmp
@@ -16,24 +17,21 @@ cd yay
 # Build and install yay
 makepkg -si --noconfirm
 
-# Clean up
+# Clean up yay build
 cd ..
 rm -rf yay
-
 echo "yay installation complete!"
 
-# Create a temporary directory for building
-mkdir -p ~/aur_builds
-cd ~/aur_builds
-cd ..
-# Clone the AUR package
+# Clone kime repository
 cd ~/다운로드
 git clone https://github.com/Riey/kime
 cd kime
 
-scripts/build.sh -ar
-# Build and install the package
-makepkg -si --noconfirm
+# Build kime
+cargo build --release
+
+# Run build script
+./scripts/build.sh -ar
 
 # Create config directory
 mkdir -p ~/.config/kime
@@ -83,11 +81,8 @@ Comment[en_US]=Korean Input Method Editor
 Comment=Korean Input Method Editor
 EOL
 
-# Clean up build directory
-cd ~
-rm -rf ~/aur_builds
-
 # Start kime immediately
 kime &
-
 echo "kime installation and configuration complete!"
+
+
