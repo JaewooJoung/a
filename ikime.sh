@@ -116,3 +116,6 @@ echo "Installing Julia..."
 curl -fsSL https://install.julialang.org | sh
 
 echo "Julia installation complete!"
+
+yay -S --noconfirm naver-whale-stable
+echo "이제 한글로 풀루토를 쓸수있네요.🥰"
