@@ -29,19 +29,31 @@ echo "yay installation complete!"
 # kime 설치 및 설정
 echo "Installing and configuring kime..."
 cd ~/Downloads || cd ~/다운로드  # Try English directory first, then Korean
-git clone https://github.com/Riey/kime
-cd kime
+if [ -d "kime" ]; then
+    echo "kime directory already exists. Updating..."
+    cd kime
+    git fetch origin
+    git checkout develop
+    git pull origin develop
+else
+    git clone https://github.com/Riey/kime
+    cd kime
+    git checkout develop
+fi
 
 # kime 빌드
+echo "Building kime..."
 cargo build --release
 
 # 빌드 스크립트 실행
+echo "Running build script..."
 ./scripts/build.sh -ar
 
 # 구성 디렉토리 생성
 mkdir -p ~/.config/kime
 
 # 기본 구성 파일 생성
+echo "Creating kime configuration file..."
 cat > ~/.config/kime/kime.yaml << 'EOL'
 log:
   version: 1
@@ -62,6 +74,7 @@ engine:
 EOL
 
 # X11용 kime 활성화
+echo "Configuring kime for X11..."
 if ! grep -q "GTK_IM_MODULE=kime" ~/.xprofile; then
     echo "export GTK_IM_MODULE=kime" >> ~/.xprofile
 fi
@@ -73,6 +86,7 @@ if ! grep -q "XMODIFIERS=@im=kime" ~/.xprofile; then
 fi
 
 # Wayland용 kime 활성화
+echo "Configuring kime for Wayland..."
 if ! grep -q "GTK_IM_MODULE=kime" ~/.bash_profile; then
     echo "export GTK_IM_MODULE=kime" >> ~/.bash_profile
 fi
@@ -84,6 +98,7 @@ if ! grep -q "XMODIFIERS=@im=kime" ~/.bash_profile; then
 fi
 
 # kime를 자동 시작 목록에 추가
+echo "Adding kime to autostart..."
 mkdir -p ~/.config/autostart
 cat > ~/.config/autostart/kime.desktop << 'EOL'
 [Desktop Entry]
@@ -99,6 +114,7 @@ Comment=Korean Input Method Editor
 EOL
 
 # kime 즉시 실행
+echo "Starting kime..."
 pkill kime || true  # 기존의 kime 프로세스 종료
 kime &
 
