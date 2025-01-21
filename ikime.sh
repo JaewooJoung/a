@@ -86,13 +86,13 @@ kime &
 echo "kime installation and configuration complete!"
 
 # Download the script
-curl -fsSL https://install.julialang.org -o julia_install.sh
+curl -fsSL https://install.julialang.org -o install.sh
 
 # Make it executable
-chmod +x julia_install.sh
+chmod +x install.sh
 
 # Run it
-./julia_install.sh
+./install.sh
 
 echo "julia installation and configuration complete!"
 
