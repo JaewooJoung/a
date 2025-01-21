@@ -92,20 +92,6 @@ kime &
 echo "kime 설치 및 설정 완료!"
 
 # Julia 설치를 위한 임시 디렉토리 생성
-mkdir -p ~/julia_install
-cd ~/julia_install
-
-# Julia 설치 스크립트 다운로드
-curl -fsSL https://install.julialang.org -o install.sh
-
-# 실행 가능하게 만들기
-chmod +x install.sh
-
-# 실행
-./install.sh
-
-# Julia 설치 파일 청소
-cd ~
-rm -rf ~/julia_install
+curl -fsSL https://install.julialang.org | sh
 
 echo "julia 설치 및 설정 완료!"
