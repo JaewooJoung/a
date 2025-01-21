@@ -3,8 +3,22 @@
 # Update the system
 sudo pacman -Syu --noconfirm
 
-# Install base-devel if not already installed
-sudo pacman -S --noconfirm base-devel git
+# Install necessary dependencies
+sudo pacman -S --needed --noconfirm git base-devel
+
+# Create a temporary directory and navigate into it
+cd /tmp
+git clone https://aur.archlinux.org/yay.git
+cd yay
+
+# Build and install yay
+makepkg -si --noconfirm
+
+# Clean up
+cd ..
+rm -rf yay
+
+echo "yay installation complete!"
 
 # Create a temporary directory for building
 mkdir -p ~/aur_builds
