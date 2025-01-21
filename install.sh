@@ -375,4 +375,80 @@ pacman -Sy --noconfirm
 pacman -S --noconfirm \
     noto-fonts-cjk noto-fonts-emoji \
     adobe-source-han-sans-kr-fonts adobe-source-han-serif-kr-fonts ttf-baekmuk \
-    powerline
+    powerline-fonts nerd-fonts ttf-lato \
+    libhangul fcitx5 fcitx5-configtool fcitx5-hangul fcitx5-gtk fcitx5-qt \
+    libreoffice-fresh libreoffice-fresh-ko
+
+# 프로그래밍 언어 및 개발 도구 설치
+pacman -S --noconfirm \
+    firefox thunderbird thunderbird-i18n-ko \
+    flatpak remmina opentofu chromium code \
+    describeimage fortunecraft llm-manager ollama ollama-docs ghostty \
+    7zip blas64-openblas fftw libblastrampoline libgit2 libunwind libutf8proc lld llvm-julia-libs mbedtls2 openlibm pcre2 suitesparse \
+    gnuplot cmake gcc-fortran libwhich llvm-julia patchelf python
+
+# fcitx5 한글 입력기 프로필 구성
+cat > /home/${USERNAME}/.config/fcitx5/profile <<EOF
+[Groups/0]
+Name=Default
+Default Layout=us
+DefaultIM=hangul
+
+[Groups/0/Items/0]
+Name=keyboard-us
+Layout=us
+
+[Groups/0/Items/1]
+Name=hangul
+Layout=kr
+
+[GroupOrder]
+0=Default
+EOF
+
+# fcitx5를 위한 환경 변수 설정
+mkdir -p /home/${USERNAME}/.config/environment.d
+cat > /home/${USERNAME}/.config/environment.d/fcitx5.conf <<EOF
+GTK_IM_MODULE=fcitx
+QT_IM_MODULE=fcitx
+XMODIFIERS=@im=fcitx
+EOF
+
+# fcitx5 자동 시작 설정
+mkdir -p /home/${USERNAME}/.config/autostart
+cat > /home/${USERNAME}/.config/autostart/fcitx5.desktop <<EOF
+[Desktop Entry]
+Type=Application
+Name=Fcitx5
+Exec=fcitx5
+Comment=Start Fcitx5 input method
+EOF
+
+# 설정 파일의 소유권을 사용자로 변경
+chown -R ${USERNAME}:${USERNAME} /home/${USERNAME}/.config
+
+# 스왑성 설정
+echo "vm.swappiness=${SWAPPINESS}" > /etc/sysctl.d/99-swappiness.conf
+
+# initramfs 생성
+mkinitcpio -P
+CHROOT_COMMANDS
+
+# 파티션 마운트 해제
+umount -R /mnt
+clear
+echo "Installation complete!"
+echo ""
+echo "IMPORTANT POST-INSTALLATION STEPS:"
+echo "1. Power off the computer completely (not reboot)"
+echo "2. Remove the USB drive"
+echo "3. Enter BIOS setup and make these changes:"
+echo "   a. Load BIOS defaults first"
+echo "   b. Disable Secure Boot"
+echo "   c. Set UEFI boot mode (disable CSM/Legacy completely)"
+echo "   d. Set Boot Device Priority to ${DEVICE}"
+echo ""
+echo "After first boot:"
+echo "1. Korean input can be toggled with Shift+Space"
+echo "2. Run 'fcitx5-configtool' to configure input method"
+echo "3. Use 'fcitx5 --debug &' if you need to troubleshoot"
