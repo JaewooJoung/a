@@ -29,32 +29,16 @@ cd ..
 rm -rf yay
 echo "yay installation complete!"
 
-# kime 설치 및 설정
-echo "Installing and configuring kime..."
-cd ~/Downloads || cd ~/다운로드  # Try English directory first, then Korean
-if [ -d "kime" ]; then
-    echo "kime directory already exists. Updating..."
-    cd kime
-    git fetch origin
-    git checkout develop
-    git pull origin develop
-else
-    git clone https://aur.archlinux.org/kime.git
-    cd kime
-    git checkout develop
-fi
+# kime, kime-bin, zoom-libkime 설치
+echo "Installing kime, kime-bin, and zoom-libkime using yay..."
+yay -S --noconfirm kime kime-bin zoom-libkime
 
-# 빌드 환경 정리
-echo "Cleaning build environment..."
-cargo clean
+# fcitx5 제거
+echo "Uninstalling fcitx5..."
+sudo pacman -Rns --noconfirm fcitx5 fcitx5-configtool fcitx5-gtk fcitx5-qt fcitx5-mozc
 
-# kime 빌드
-echo "Building kime..."
-cargo build --release
-
-# 빌드 스크립트 실행
-echo "Running build script..."
-./scripts/build.sh -ar
+# kime 설정
+echo "Configuring kime..."
 
 # 구성 디렉토리 생성
 mkdir -p ~/.config/kime
