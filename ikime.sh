@@ -4,7 +4,6 @@
 sudo pacman -Syu --noconfirm
 
 # Install necessary dependencies
-# Install necessary dependencies
 sudo pacman -S --needed --noconfirm \
 git base-devel gcc clang cmake pkg-config gtk3 gtk4 qt5-base qt6-base \
 libxcb libdbus fontconfig freetype2 libxkbcommon
