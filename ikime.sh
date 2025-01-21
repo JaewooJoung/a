@@ -9,7 +9,7 @@ sudo pacman -Syu --noconfirm
 
 # 필요한 종속성 설치
 echo "Installing dependencies..."
-sudo pacman -S --needed --noconfirm git base-devel gcc clang cmake pkg-config gtk3 gtk4 qt5-base qt6-base libxcb libdbus fontconfig freetype2 libxkbcommon
+sudo pacman -S --needed --noconfirm git base-devel gcc clang cmake pkg-config gtk3 gtk4 qt5-base qt6-base libxcb libdbus fontconfig freetype2 libxkbcommon wayland
 
 # Rust 설치
 echo "Installing Rust..."
@@ -40,6 +40,18 @@ else
     cd kime
     git checkout develop
 fi
+
+# 빌드 환경 정리
+echo "Cleaning build environment..."
+cargo clean
+
+# kime_engine 빌드
+echo "Building kime_engine..."
+cargo build -p kime_engine --release
+
+# kime-wayland 빌드
+echo "Building kime-wayland..."
+cargo build -p kime-wayland --release --verbose
 
 # kime 빌드
 echo "Building kime..."
