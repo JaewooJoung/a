@@ -36,7 +36,7 @@ if [ -d "kime" ]; then
     git checkout develop
     git pull origin develop
 else
-    git clone https://github.com/Riey/kime
+    git clone https://aur.archlinux.org/kime.git
     cd kime
     git checkout develop
 fi
