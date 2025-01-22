@@ -1,85 +1,73 @@
 #!/bin/bash
 
-# 오류 발생 시 즉시 중단
+# 오류가 발생하면 즉시 종료
 set -e
 
-# 로그 함수
-log() {
-    echo "$(date '+%Y-%m-%d %H:%M:%S') - $1"
-}
+# 시스템 업데이트
+echo "Updating system..."
+sudo pacman -Syu --noconfirm
 
-# 오류 핸들러
-handle_error() {
-    log "Error occurred in line $1"
-    exit 1
-}
+# 필요한 종속성 설치
+echo "Installing dependencies..."
+sudo pacman -S --needed --noconfirm \
+    git base-devel gcc clang cmake pkg-config \
+    gtk3 gtk4 qt5-base qt6-base libxcb libdbus fontconfig freetype2 libxkbcommon wayland \
+    noto-fonts-cjk cairo cargo dbus llvm
 
-trap 'handle_error $LINENO' ERR
+# Rust 설치
+echo "Installing Rust..."
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+source "$HOME/.cargo/env"
 
-# 기본 의존성 설치
-log "Installing build dependencies..."
-sudo pacman -Syu --needed --noconfirm \
-    git \
-    base-devel \
-    cmake \
-    pkg-config \
-    clang \
-    gtk3 \
-    gtk4 \
-    qt5-base \
-    qt6-base \
-    libxcb \
-    libdbus \
-    fontconfig \
-    freetype2 \
-    libxkbcommon \
-    wayland \
-    wayland-protocols \
-    libxkbcommon-x11 \
-    librime \
-    libappindicator-gtk3 \
-    rustup
+# yay 설치
+echo "Installing yay..."
+cd /tmp
+git clone https://aur.archlinux.org/yay.git
+cd yay
+makepkg -si --noconfirm
+cd ..
+rm -rf yay
+echo "yay installation complete!"
 
-# Rust 툴체인 설정
-log "Setting up Rust toolchain..."
-if ! command -v rustc &> /dev/null; then
-    rustup default stable
-    log "Rust stable toolchain installed"
+# kime 설치 및 설정
+echo "Installing and configuring kime..."
+cd ~/Downloads || cd ~/다운로드  # Try English directory first, then Korean
+if [ -d "kime" ]; then
+    echo "kime directory already exists. Updating..."
+    cd kime
+    git fetch origin
+    git checkout develop
+    git pull origin develop
 else
-    log "Rust is already installed"
+    git clone https://aur.archlinux.org/kime.git
+    cd kime
+    git checkout develop
 fi
+# 빌드 환경 정리
+echo "Cleaning build environment..."
+cargo clean
+# kime, kime-bin, zoom-libkime 설치
+echo "Installing kime, kime-bin, and zoom-libkime using yay..."
+yay -S --noconfirm kime kime-bin zoom-libkime
 
-# kime 빌드를 위한 임시 디렉토리 생성
-BUILD_DIR=$(mktemp -d)
-log "Created build directory: $BUILD_DIR"
-
-# 빌드 디렉토리 정리를 위한 트랩 설정
-trap 'rm -rf $BUILD_DIR' EXIT
-
-# kime 소스 코드 클론
-log "Cloning kime repository..."
-cd "$BUILD_DIR"
-git clone https://github.com/Riey/kime.git
-cd kime
+# kime 빌드
+echo "Building kime..."
+cargo build --release
+# fcitx5 제거
+echo "Uninstalling fcitx5..."
+sudo pacman -Rns --noconfirm fcitx5 fcitx5-configtool fcitx5-gtk fcitx5-qt fcitx5-mozc
 
 # 빌드 스크립트 실행
-log "Building kime..."
+echo "Running build script..."
 ./scripts/build.sh -ar
+# kime 설정
+echo "Configuring kime..."
 
-# 설치
-log "Installing kime..."
-sudo ./scripts/install.sh /usr
-
-# GTK 모듈 캐시 업데이트
-log "Updating GTK module cache..."
-sudo gtk-query-immodules-3.0 --update-cache
-sudo gio-querymodules /usr/lib/gtk-4.0/4.0.0/immodules
-
-# 설정 파일 생성
-log "Creating configuration files..."
+# 구성 디렉토리 생성
 mkdir -p ~/.config/kime
 
-# kime 설정 파일 생성
+# 기본 구성 파일 생성
+echo "Creating kime configuration file..."
 cat > ~/.config/kime/kime.yaml << 'EOL'
 log:
   version: 1
@@ -99,19 +87,32 @@ engine:
   commit_key2: "Shift"
 EOL
 
-# Plasma Wayland 환경변수 설정
-log "Setting up environment variables..."
-mkdir -p ~/.config/plasma-workspace/env/
-cat > ~/.config/plasma-workspace/env/kime.sh << 'EOL'
-#!/bin/sh
-export GTK_IM_MODULE=kime
-export QT_IM_MODULE=kime
-export XMODIFIERS=@im=kime
-EOL
-chmod +x ~/.config/plasma-workspace/env/kime.sh
+# X11용 kime 활성화
+echo "Configuring kime for X11..."
+if ! grep -q "GTK_IM_MODULE=kime" ~/.xprofile; then
+    echo "export GTK_IM_MODULE=kime" >> ~/.xprofile
+fi
+if ! grep -q "QT_IM_MODULE=kime" ~/.xprofile; then
+    echo "export QT_IM_MODULE=kime" >> ~/.xprofile
+fi
+if ! grep -q "XMODIFIERS=@im=kime" ~/.xprofile; then
+    echo "export XMODIFIERS=@im=kime" >> ~/.xprofile
+fi
 
-# 자동 시작 설정
-log "Setting up autostart..."
+# Wayland용 kime 활성화
+echo "Configuring kime for Wayland..."
+if ! grep -q "GTK_IM_MODULE=kime" ~/.bash_profile; then
+    echo "export GTK_IM_MODULE=kime" >> ~/.bash_profile
+fi
+if ! grep -q "QT_IM_MODULE=kime" ~/.bash_profile; then
+    echo "export QT_IM_MODULE=kime" >> ~/.bash_profile
+fi
+if ! grep -q "XMODIFIERS=@im=kime" ~/.bash_profile; then
+    echo "export XMODIFIERS=@im=kime" >> ~/.bash_profile
+fi
+
+# kime를 자동 시작 목록에 추가
+echo "Adding kime to autostart..."
 mkdir -p ~/.config/autostart
 cat > ~/.config/autostart/kime.desktop << 'EOL'
 [Desktop Entry]
@@ -126,11 +127,9 @@ Comment[en_US]=Korean Input Method Editor
 Comment=Korean Input Method Editor
 EOL
 
-log "Installation completed successfully!"
-echo "===================================="
-echo "Please do the following:"
-echo "1. Go to System Settings > Hardware > Input Devices > Virtual Keyboard"
-echo "2. Select 'kime daemon'"
-echo "3. Log out and log back in"
-echo "4. Use Shift+Space or Hangul key to toggle Korean input"
-echo "===================================="
+# kime 즉시 실행
+echo "Starting kime..."
+pkill kime || true  # 기존의 kime 프로세스 종료
+kime &
+
+echo "kime installation and configuration complete!"
