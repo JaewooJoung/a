@@ -113,3 +113,6 @@ curl -O https://jaewoojoung.github.io/a/install.sh && chmod +x install.sh && bas
 3. `fcitx5 --debug &`로 입력기 디버깅
 
 ## 🌈 아치리눅스로 바꾼 당신은 지금 리눅스🐧의 **모든** 최신기술을 쓰시고 있습니다. 🥰
+
+
+![Julia Logo](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAQAAAAngNWGAAABDUlEQVR4AYXRgUZDYRjH4TegGJgqCCj6CQYrKq9A8gqKq9A8gqKq9A8gqKq9A8gqKq9A8gqKq9A8gqKq9A8gqKq9A8gqKq9A8gqKq9A8gqKq9A8gqKq9A8gqKq9A8gqKq9A8gqKq9A8gqKq9A8gqKq9A8gqKq9A8gqKq9A8gqKq9A8gqKq9A8gqKq9A8gqKq9A8gqKq9A8gqKq9A8gqKq9A8gqKq9A8gqKq9A8gqKq9A8gqKq9A8gqKq9A8gqKq9A8gqKq9A8gqKq9A8gqKq9A8gqKq9A8gqKq9A8gqKq9A8gqKq9A8gqKq9A8gqKq9A8gqKq9A8gqKq9A8gqKq9A8gqKq9A8gqKq9A8gqKq9A8gqKq9A8gqKq9A8gqKq9A8gqKq9A8gqKq9A8gqKq9A8gqKq9A8gqKq9A8gqKq9A8gqKq9A8gqKq9A8gqKq9A8gqKq9A8gqKq9A8gqKq9A8gqKq9A8gqKq9A8gqKq9A8gqKq9A8gqKq9A8gqKq9A8gqKq9A8gqKq9A8gqKq9A8gqKq9A8gqKq9A8gqKq9A8gqKq9A8gqKq9A8gqKq9A8gqKq9A8gqKq9A8gqKq9A8gqKq9A8gqKq9A8gqKq9A8gqKq9A8gqKq9A8gqKq9A8gqKq9A8gqKq9A8gqKq9A8gqKq9A8gqKq9A8gqKq9A8gqKq9A8gqKq9A8gqKq9A8gqKq9A8gqKq9A8gqKq9A8gqKq9A8gqKq9A8gqKq9A8gqKq9A8gqKq9A8gqKq9A8gqKq9A8gqKq9A8gqKq9A8gqKq9A8gqKq9A8gqKq9A8gqKq)
