@@ -35,7 +35,7 @@ cd ~/다운로드  #  Korean
 
 # kime, kime-bin, zoom-libkime 설치
 echo "Installing kime, kime-bin, and zoom-libkime using yay..."
-yay -S --noconfirm kime kime-bin zoom zoom-libkime
+yay -S --noconfirm kime kime-bin
 
 
 # fcitx5 제거
