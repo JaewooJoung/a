@@ -42,7 +42,7 @@ if [ -f /etc/xdg/autostart/fcitx5.desktop ]; then
     echo "Hidden=true" >> ~/.config/autostart/fcitx5.desktop
 fi
 
-# kime 존재시 지움
+# kime 지우기
 cd ~/.cache/yay/kime
 rm -rf src/ pkg/
 
