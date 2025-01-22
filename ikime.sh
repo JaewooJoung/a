@@ -120,10 +120,11 @@ echo "Updating GTK module cache..."
 sudo gtk-query-immodules-3.0 --update-cache
 sudo gio-querymodules /usr/lib/gtk-4.0/4.0.0/immodules
 
-echo "Installation complete! Please follow these steps:"
-echo "1. Go to System Settings > Hardware > Input Devices > Virtual Keyboard"
-echo "2. Select 'kime daemon'"
-echo "3. Log out and log back in to apply changes"
+echo "설치가 완료되었습니다! 다음 단계를 따라주세요:"
+echo "1. 시스템 설정 > 하드웨어 > 입력 장치 > 가상 키보드로 이동합니다."
+echo "2. 'kime daemon'을 선택합니다."
+echo "3. 변경 사항을 적용하려면 로그아웃한 후 다시 로그인합니다."
 echo ""
-echo "Note: Your previous fcitx5 configuration has been backed up to ~/.config/fcitx5.backup"
-echo "To toggle Korean input after logging back in, use Shift+Space or the Hangul key"
+echo "참고: 이전 fcitx5 구성은 ~/.config/fcitx5.backup에 백업되었습니다."
+echo "다시 로그인한 후 한국어 입력을 전환하려면 Shift+Space 또는 한글 키를 사용하세요."
+
