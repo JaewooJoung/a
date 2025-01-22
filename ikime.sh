@@ -33,9 +33,6 @@ echo "yay installation complete!"
 echo "Installing and configuring kime..."
 cd ~/다운로드  #  Korean
 
-# 빌드 환경 정리
-echo "Cleaning build environment..."
-cargo clean
 # kime, kime-bin, zoom-libkime 설치
 echo "Installing kime, kime-bin, and zoom-libkime using yay..."
 yay -S --noconfirm kime kime-bin
