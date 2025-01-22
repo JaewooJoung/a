@@ -7,43 +7,50 @@ set -e
 echo "Updating system..."
 sudo pacman -Syu --noconfirm
 
-# 필요한 종속성 설치
+# 필요한 종속성 설치 (Plasma Wayland 환경에 맞춤)
 echo "Installing dependencies..."
 sudo pacman -S --needed --noconfirm \
-    git base-devel gcc clang cmake pkg-config \
-    gtk3 gtk4 qt5-base qt6-base libxcb libdbus fontconfig freetype2 libxkbcommon wayland \
-    noto-fonts-cjk cairo cargo dbus llvm
+    git base-devel cmake pkg-config \
+    gtk3 gtk4 qt5-base qt6-base \
+    libxcb libdbus fontconfig freetype2 \
+    libxkbcommon wayland clang \
+    noto-fonts-cjk cargo
 
-# Rust 설치
-echo "Installing Rust..."
-curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
-source "$HOME/.cargo/env"
+# yay가 없는 경우 설치
+if ! command -v yay &> /dev/null; then
+    echo "Installing yay..."
+    cd /tmp
+    git clone https://aur.archlinux.org/yay.git
+    cd yay
+    makepkg -si --noconfirm
+    cd ..
+    rm -rf yay
+    echo "yay installation complete!"
+fi
 
-# yay 설치
-echo "Installing yay..."
-cd /tmp
-git clone https://aur.archlinux.org/yay.git
-cd yay
-makepkg -si --noconfirm
-cd ..
-rm -rf yay
-echo "yay installation complete!"
+# fcitx5 설정 백업 (나중을 위해)
+if [ -d ~/.config/fcitx5 ]; then
+    echo "Backing up fcitx5 configuration..."
+    cp -r ~/.config/fcitx5 ~/.config/fcitx5.backup
+fi
 
-# kime, kime-bin, zoom-libkime 설치
-echo "Installing kime, kime-bin, and zoom-libkime using yay..."
-yay -S --noconfirm kime kime-bin
+# fcitx5 비활성화 (제거하지 않고 비활성화)
+echo "Disabling fcitx5 autostart..."
+mkdir -p ~/.config/autostart
+if [ -f /etc/xdg/autostart/fcitx5.desktop ]; then
+    cp /etc/xdg/autostart/fcitx5.desktop ~/.config/autostart/
+    echo "Hidden=true" >> ~/.config/autostart/fcitx5.desktop
+fi
 
-# fcitx5 제거
-echo "Uninstalling fcitx5..."
-sudo pacman -Rns --noconfirm fcitx5 fcitx5-configtool fcitx5-gtk fcitx5-qt fcitx5-mozc || true
+# kime 설치
+echo "Installing kime..."
+yay -S --noconfirm kime
 
-# kime 설정
+# kime 설정 디렉토리 생성
 echo "Configuring kime..."
-# 구성 디렉토리 생성
 mkdir -p ~/.config/kime
 
-# 기본 구성 파일 생성
-echo "Creating kime configuration file..."
+# kime 설정 파일 생성 (Plasma Wayland에 최적화)
 cat > ~/.config/kime/kime.yaml << 'EOL'
 log:
   version: 1
@@ -63,24 +70,19 @@ engine:
   commit_key2: "Shift"
 EOL
 
-# X11용 kime 활성화
-echo "Configuring kime for X11..."
-{
-    echo "export GTK_IM_MODULE=kime"
-    echo "export QT_IM_MODULE=kime"
-    echo "export XMODIFIERS=@im=kime"
-} >> ~/.xprofile
+# Plasma Wayland 환경변수 설정
+echo "Configuring environment variables..."
+mkdir -p ~/.config/plasma-workspace/env/
+cat > ~/.config/plasma-workspace/env/kime.sh << 'EOL'
+#!/bin/sh
+export GTK_IM_MODULE=kime
+export QT_IM_MODULE=kime
+export XMODIFIERS=@im=kime
+EOL
+chmod +x ~/.config/plasma-workspace/env/kime.sh
 
-# Wayland용 kime 활성화
-echo "Configuring kime for Wayland..."
-{
-    echo "export GTK_IM_MODULE=kime"
-    echo "export QT_IM_MODULE=kime"
-    echo "export XMODIFIERS=@im=kime"
-} >> ~/.bash_profile
-
-# kime를 자동 시작 목록에 추가
-echo "Adding kime to autostart..."
+# kime 자동시작 설정
+echo "Setting up kime autostart..."
 mkdir -p ~/.config/autostart
 cat > ~/.config/autostart/kime.desktop << 'EOL'
 [Desktop Entry]
@@ -95,19 +97,15 @@ Comment[en_US]=Korean Input Method Editor
 Comment=Korean Input Method Editor
 EOL
 
-# kime 즉시 실행
-echo "Starting kime..."
-pkill kime || true  # 기존의 kime 프로세스 종료
-kime &
+# GTK 모듈 캐시 업데이트
+echo "Updating GTK module cache..."
+sudo gtk-query-immodules-3.0 --update-cache
+sudo gio-querymodules /usr/lib/gtk-4.0/4.0.0/immodules
 
-echo "kime installation and configuration complete!"
-
-# Julia 설치
-echo "Installing Julia..."
-curl -fsSL https://install.julialang.org | sh
-echo "Julia installation complete!"
-
-# Naver Whale 브라우저 설치
-yay -S --noconfirm naver-whale-stable
-
-echo "이제 한글로 플루토를 쓸 수 있네요. 🥰"
+echo "Installation complete! Please follow these steps:"
+echo "1. Go to System Settings > Hardware > Input Devices > Virtual Keyboard"
+echo "2. Select 'kime daemon'"
+echo "3. Log out and log back in to apply changes"
+echo ""
+echo "Note: Your previous fcitx5 configuration has been backed up to ~/.config/fcitx5.backup"
+echo "To toggle Korean input after logging back in, use Shift+Space or the Hangul key"
