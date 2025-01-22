@@ -1,74 +1,80 @@
 #!/bin/bash
 
-# 오류가 발생하면 즉시 종료
+# 오류 발생 시 즉시 중단
 set -e
 
-# 시스템 업데이트
-echo "Updating system..."
-sudo pacman -Syu --noconfirm
+# 로그 함수
+log() {
+    echo "$(date '+%Y-%m-%d %H:%M:%S') - $1"
+}
 
-# 필요한 종속성 설치 (Plasma Wayland 환경에 맞춤)
-echo "Installing dependencies..."
-sudo pacman -S --needed --noconfirm \
-    git base-devel cmake pkg-config \
-    gtk3 gtk4 qt5-base qt6-base \
-    libxcb libdbus fontconfig freetype2 \
-    libxkbcommon wayland clang \
-    noto-fonts-cjk cargo icu
+# 오류 핸들러
+handle_error() {
+    log "Error occurred in line $1"
+    exit 1
+}
 
-# yay가 없는 경우 설치
-if ! command -v yay &> /dev/null; then
-    echo "Installing yay..."
-    cd /tmp
-    git clone https://aur.archlinux.org/yay.git
-    cd yay
-    makepkg -si --noconfirm
-    cd ..
-    rm -rf yay
-    echo "yay installation complete!"
-fi
+trap 'handle_error $LINENO' ERR
 
-# fcitx5 설정 백업 (나중을 위해)
-if [ -d ~/.config/fcitx5 ]; then
-    echo "Backing up fcitx5 configuration..."
-    cp -r ~/.config/fcitx5 ~/.config/fcitx5.backup
-fi
+# 기본 의존성 설치
+log "Installing build dependencies..."
+sudo pacman -Syu --needed --noconfirm \
+    git \
+    base-devel \
+    cmake \
+    pkg-config \
+    cargo \
+    clang \
+    gtk3 \
+    gtk4 \
+    qt5-base \
+    qt6-base \
+    libxcb \
+    libdbus \
+    fontconfig \
+    freetype2 \
+    libxkbcommon \
+    wayland \
+    wayland-protocols \
+    libxkbcommon-x11 \
+    librime \
+    libappindicator-gtk3
 
-# fcitx5 비활성화 (제거하지 않고 비활성화)
-echo "Disabling fcitx5 autostart..."
-mkdir -p ~/.config/autostart
-if [ -f /etc/xdg/autostart/fcitx5.desktop ]; then
-    cp /etc/xdg/autostart/fcitx5.desktop ~/.config/autostart/
-    echo "Hidden=true" >> ~/.config/autostart/fcitx5.desktop
-fi
+# kime 빌드를 위한 임시 디렉토리 생성
+BUILD_DIR=$(mktemp -d)
+log "Created build directory: $BUILD_DIR"
 
-# kime 설치 시도 (yay를 통해)
-echo "Attempting to install kime using yay..."
-if yay -S --noconfirm kime; then
-    echo "kime installed successfully using yay."
-else
-    echo "yay installation failed. Attempting manual build..."
+# 빌드 디렉토리 정리를 위한 트랩 설정
+trap 'rm -rf $BUILD_DIR' EXIT
 
-    # Clone the official kime repository
-    cd /tmp
-    rm -rf kime  # Remove any existing kime directory
-    git clone https://aur.archlinux.org/kime.git
-    cd kime
+# kime 소스 코드 클론
+log "Cloning kime repository..."
+cd "$BUILD_DIR"
+git clone https://github.com/Riey/kime.git
+cd kime
 
-    # Build and install kime
-    echo "Building kime from source..."
-    cargo build --release
-    sudo cp target/release/kime /usr/bin/
-    sudo cp target/release/libkime_engine.so /usr/lib/
+# cargo 환경 설정
+log "Setting up cargo environment..."
+source "$HOME/.cargo/env"
 
-    echo "kime installed successfully from source."
-fi
+# 빌드 스크립트 실행
+log "Building kime..."
+./scripts/build.sh -ar
 
-# kime 설정 디렉토리 생성
-echo "Configuring kime..."
+# 설치
+log "Installing kime..."
+sudo ./scripts/install.sh /usr
+
+# GTK 모듈 캐시 업데이트
+log "Updating GTK module cache..."
+sudo gtk-query-immodules-3.0 --update-cache
+sudo gio-querymodules /usr/lib/gtk-4.0/4.0.0/immodules
+
+# 설정 파일 생성
+log "Creating configuration files..."
 mkdir -p ~/.config/kime
 
-# kime 설정 파일 생성 (Plasma Wayland에 최적화)
+# kime 설정 파일 생성
 cat > ~/.config/kime/kime.yaml << 'EOL'
 log:
   version: 1
@@ -89,7 +95,7 @@ engine:
 EOL
 
 # Plasma Wayland 환경변수 설정
-echo "Configuring environment variables..."
+log "Setting up environment variables..."
 mkdir -p ~/.config/plasma-workspace/env/
 cat > ~/.config/plasma-workspace/env/kime.sh << 'EOL'
 #!/bin/sh
@@ -99,8 +105,8 @@ export XMODIFIERS=@im=kime
 EOL
 chmod +x ~/.config/plasma-workspace/env/kime.sh
 
-# kime 자동시작 설정
-echo "Setting up kime autostart..."
+# 자동 시작 설정
+log "Setting up autostart..."
 mkdir -p ~/.config/autostart
 cat > ~/.config/autostart/kime.desktop << 'EOL'
 [Desktop Entry]
@@ -115,16 +121,11 @@ Comment[en_US]=Korean Input Method Editor
 Comment=Korean Input Method Editor
 EOL
 
-# GTK 모듈 캐시 업데이트
-echo "Updating GTK module cache..."
-sudo gtk-query-immodules-3.0 --update-cache
-sudo gio-querymodules /usr/lib/gtk-4.0/4.0.0/immodules
-
-echo "설치가 완료되었습니다! 다음 단계를 따라주세요:"
-echo "1. 시스템 설정 > 하드웨어 > 입력 장치 > 가상 키보드로 이동합니다."
-echo "2. 'kime daemon'을 선택합니다."
-echo "3. 변경 사항을 적용하려면 로그아웃한 후 다시 로그인합니다."
-echo ""
-echo "참고: 이전 fcitx5 구성은 ~/.config/fcitx5.backup에 백업되었습니다."
-echo "다시 로그인한 후 한국어 입력을 전환하려면 Shift+Space 또는 한글 키를 사용하세요."
-
+log "Installation completed successfully!"
+echo "===================================="
+echo "Please do the following:"
+echo "1. Go to System Settings > Hardware > Input Devices > Virtual Keyboard"
+echo "2. Select 'kime daemon'"
+echo "3. Log out and log back in"
+echo "4. Use Shift+Space or Hangul key to toggle Korean input"
+echo "===================================="
