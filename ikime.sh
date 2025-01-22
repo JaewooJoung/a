@@ -9,7 +9,10 @@ sudo pacman -Syu --noconfirm
 
 # 필요한 종속성 설치
 echo "Installing dependencies..."
-sudo pacman -S --needed --noconfirm git base-devel gcc clang cmake pkg-config gtk3 gtk4 qt5-base qt6-base libxcb libdbus fontconfig freetype2 libxkbcommon wayland
+sudo pacman -S --needed --noconfirm \
+    git base-devel gcc clang cmake pkg-config \
+    gtk3 gtk4 qt5-base qt6-base libxcb libdbus fontconfig freetype2 libxkbcommon wayland \
+    noto-fonts-cjk cairo cargo dbus llvm
 
 # Rust 설치
 echo "Installing Rust..."
@@ -36,28 +39,29 @@ if [ -d "kime" ]; then
     git checkout develop
     git pull origin develop
 else
-    git clone https://github.com/Riey/kime
+    git clone https://aur.archlinux.org/kime.git
     cd kime
     git checkout develop
 fi
-
 # 빌드 환경 정리
 echo "Cleaning build environment..."
 cargo clean
+# kime, kime-bin, zoom-libkime 설치
+echo "Installing kime, kime-bin, and zoom-libkime using yay..."
+yay -S --noconfirm kime kime-bin zoom-libkime
 
-# kime_engine 빌드
-echo "Building kime_engine..."
-cargo build -p kime_engine --release
-# kime-wayland 빌드
-echo "Building kime-wayland..."
-cargo build -p kime-wayland --release --verbose
 # kime 빌드
 echo "Building kime..."
 cargo build --release
+# fcitx5 제거
+echo "Uninstalling fcitx5..."
+sudo pacman -Rns --noconfirm fcitx5 fcitx5-configtool fcitx5-gtk fcitx5-qt fcitx5-mozc
 
 # 빌드 스크립트 실행
 echo "Running build script..."
 ./scripts/build.sh -ar
+# kime 설정
+echo "Configuring kime..."
 
 # 구성 디렉토리 생성
 mkdir -p ~/.config/kime
@@ -129,3 +133,9 @@ pkill kime || true  # 기존의 kime 프로세스 종료
 kime &
 
 echo "kime installation and configuration complete!"
+
+# Julia 설치
+echo "Installing Julia..."
+curl -fsSL https://install.julialang.org | sh
+
+echo "Julia installation complete!"
