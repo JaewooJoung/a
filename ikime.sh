@@ -23,7 +23,6 @@ sudo pacman -Syu --needed --noconfirm \
     base-devel \
     cmake \
     pkg-config \
-    cargo \
     clang \
     gtk3 \
     gtk4 \
@@ -39,6 +38,22 @@ sudo pacman -Syu --needed --noconfirm \
     libxkbcommon-x11 \
     librime \
     libappindicator-gtk3
+
+# Rust 설치
+log "Installing Rust..."
+if ! command -v rustc &> /dev/null; then
+    log "Rust not found. Installing..."
+    curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+    source "$HOME/.cargo/env"
+else
+    log "Rust is already installed"
+fi
+
+# cargo 환경 확인
+if [ ! -f "$HOME/.cargo/env" ]; then
+    log "Cargo environment not found. Please ensure Rust was installed correctly."
+    exit 1
+fi
 
 # kime 빌드를 위한 임시 디렉토리 생성
 BUILD_DIR=$(mktemp -d)
