@@ -52,7 +52,7 @@ else
     # Clone the official kime repository
     cd /tmp
     rm -rf kime  # Remove any existing kime directory
-    git clone https://github.com/Riey/kime.git
+    git clone https://aur.archlinux.org/kime.git
     cd kime
 
     # Build and install kime
