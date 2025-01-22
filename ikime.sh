@@ -31,7 +31,7 @@ echo "yay installation complete!"
 
 # kime, kime-bin, zoom-libkime 설치
 echo "Installing kime, kime-bin, and zoom-libkime using yay..."
-yay -S --noconfirm kime kime-bin kime-git
+yay -S --noconfirm kime kime-bin
 
 # fcitx5 제거
 echo "Uninstalling fcitx5..."
