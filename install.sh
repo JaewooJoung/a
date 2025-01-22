@@ -385,7 +385,11 @@ pacman -S --noconfirm \
     flatpak remmina opentofu chromium code \
     describeimage fortunecraft llm-manager ollama ollama-docs ghostty \
     7zip blas64-openblas fftw libblastrampoline libgit2 libunwind libutf8proc lld llvm-julia-libs mbedtls2 openlibm pcre2 suitesparse \
-    gnuplot cmake gcc-fortran libwhich llvm-julia patchelf python
+    gnuplot cmake gcc-fortran libwhich llvm-julia patchelf python git base-devel cmake pkg-config \
+    gtk3 gtk4 qt5-base qt6-base \
+    libxcb libdbus fontconfig freetype2 \
+    libxkbcommon wayland clang \
+    noto-fonts-cjk cargo
 
 # fcitx5 한글 입력기 프로필 구성
 cat > /home/${USERNAME}/.config/fcitx5/profile <<EOF
