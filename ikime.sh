@@ -3,6 +3,30 @@
 # 오류가 발생하면 즉시 종료
 set -e
 
+# Refresh Pacman and GnuPG keys
+echo "Removing existing GnuPG directory..."
+sudo rm -rf /etc/pacman.d/gnupg
+
+echo "Synchronizing package databases and installing gnupg and archlinux-keyring..."
+sudo pacman -Sy gnupg archlinux-keyring
+
+echo "Initializing Pacman keyring..."
+sudo pacman-key --init
+
+echo "Populating Arch Linux keyring..."
+sudo pacman-key --populate archlinux
+
+echo "Refreshing keys..."
+sudo pacman-key --refresh-keys
+
+echo "Cleaning up package cache..."
+sudo pacman -Sc
+
+echo "Updating all installed packages..."
+sudo pacman -Su
+
+echo "Key refresh and system update complete!"
+
 # 시스템 업데이트
 echo "Updating system..."
 sudo pacman -Syu --noconfirm
