@@ -37,22 +37,16 @@ sudo pacman -Syu --needed --noconfirm \
     wayland-protocols \
     libxkbcommon-x11 \
     librime \
-    libappindicator-gtk3
+    libappindicator-gtk3 \
+    rustup
 
-# Rust 설치
-log "Installing Rust..."
+# Rust 툴체인 설정
+log "Setting up Rust toolchain..."
 if ! command -v rustc &> /dev/null; then
-    log "Rust not found. Installing..."
-    curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
-    source "$HOME/.cargo/env"
+    rustup default stable
+    log "Rust stable toolchain installed"
 else
     log "Rust is already installed"
-fi
-
-# cargo 환경 확인
-if [ ! -f "$HOME/.cargo/env" ]; then
-    log "Cargo environment not found. Please ensure Rust was installed correctly."
-    exit 1
 fi
 
 # kime 빌드를 위한 임시 디렉토리 생성
@@ -67,10 +61,6 @@ log "Cloning kime repository..."
 cd "$BUILD_DIR"
 git clone https://github.com/Riey/kime.git
 cd kime
-
-# cargo 환경 설정
-log "Setting up cargo environment..."
-source "$HOME/.cargo/env"
 
 # 빌드 스크립트 실행
 log "Building kime..."
