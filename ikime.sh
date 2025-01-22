@@ -35,11 +35,10 @@ yay -S --noconfirm kime kime-bin zoom-libkime
 
 # fcitx5 제거
 echo "Uninstalling fcitx5..."
-sudo pacman -Rns --noconfirm fcitx5 fcitx5-configtool fcitx5-gtk fcitx5-qt fcitx5-mozc
+sudo pacman -Rns --noconfirm fcitx5 fcitx5-configtool fcitx5-gtk fcitx5-qt fcitx5-mozc || true
 
 # kime 설정
 echo "Configuring kime..."
-
 # 구성 디렉토리 생성
 mkdir -p ~/.config/kime
 
@@ -66,27 +65,19 @@ EOL
 
 # X11용 kime 활성화
 echo "Configuring kime for X11..."
-if ! grep -q "GTK_IM_MODULE=kime" ~/.xprofile; then
-    echo "export GTK_IM_MODULE=kime" >> ~/.xprofile
-fi
-if ! grep -q "QT_IM_MODULE=kime" ~/.xprofile; then
-    echo "export QT_IM_MODULE=kime" >> ~/.xprofile
-fi
-if ! grep -q "XMODIFIERS=@im=kime" ~/.xprofile; then
-    echo "export XMODIFIERS=@im=kime" >> ~/.xprofile
-fi
+{
+    echo "export GTK_IM_MODULE=kime"
+    echo "export QT_IM_MODULE=kime"
+    echo "export XMODIFIERS=@im=kime"
+} >> ~/.xprofile
 
 # Wayland용 kime 활성화
 echo "Configuring kime for Wayland..."
-if ! grep -q "GTK_IM_MODULE=kime" ~/.bash_profile; then
-    echo "export GTK_IM_MODULE=kime" >> ~/.bash_profile
-fi
-if ! grep -q "QT_IM_MODULE=kime" ~/.bash_profile; then
-    echo "export QT_IM_MODULE=kime" >> ~/.bash_profile
-fi
-if ! grep -q "XMODIFIERS=@im=kime" ~/.bash_profile; then
-    echo "export XMODIFIERS=@im=kime" >> ~/.bash_profile
-fi
+{
+    echo "export GTK_IM_MODULE=kime"
+    echo "export QT_IM_MODULE=kime"
+    echo "export XMODIFIERS=@im=kime"
+} >> ~/.bash_profile
 
 # kime를 자동 시작 목록에 추가
 echo "Adding kime to autostart..."
@@ -114,8 +105,9 @@ echo "kime installation and configuration complete!"
 # Julia 설치
 echo "Installing Julia..."
 curl -fsSL https://install.julialang.org | sh
-
 echo "Julia installation complete!"
 
+# Naver Whale 브라우저 설치
 yay -S --noconfirm naver-whale-stable
-echo "이제 한글로 풀루토를 쓸수있네요.🥰"
+
+echo "이제 한글로 플루토를 쓸 수 있네요. 🥰"
