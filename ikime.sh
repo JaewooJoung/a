@@ -46,6 +46,16 @@ fi
 cd ~/.cache/yay/kime
 rm -rf src/ pkg/
 
+# Clone the kime repository
+cd /tmp
+git clone https://aur.archlinux.org/kime.git
+cd kime
+
+# Build and install kime
+cargo build --release
+sudo cp target/release/kime /usr/bin/
+sudo cp target/release/kime_engine /usr/lib/
+
 # kime 설치
 echo "Installing kime..."
 yay -S --noconfirm kime
