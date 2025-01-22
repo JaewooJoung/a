@@ -14,7 +14,7 @@ sudo pacman -S --needed --noconfirm \
     gtk3 gtk4 qt5-base qt6-base \
     libxcb libdbus fontconfig freetype2 \
     libxkbcommon wayland clang \
-    noto-fonts-cjk cargo
+    noto-fonts-cjk cargo icu
 
 # yay가 없는 경우 설치
 if ! command -v yay &> /dev/null; then
@@ -41,6 +41,10 @@ if [ -f /etc/xdg/autostart/fcitx5.desktop ]; then
     cp /etc/xdg/autostart/fcitx5.desktop ~/.config/autostart/
     echo "Hidden=true" >> ~/.config/autostart/fcitx5.desktop
 fi
+
+# kime 존재시 지움
+cd ~/.cache/yay/kime
+rm -rf src/ pkg/
 
 # kime 설치
 echo "Installing kime..."
