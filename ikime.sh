@@ -42,23 +42,26 @@ if [ -f /etc/xdg/autostart/fcitx5.desktop ]; then
     echo "Hidden=true" >> ~/.config/autostart/fcitx5.desktop
 fi
 
-# kime 지우기
-cd ~/.cache/yay/kime
-rm -rf src/ pkg/
+# kime 설치 시도 (yay를 통해)
+echo "Attempting to install kime using yay..."
+if yay -S --noconfirm kime; then
+    echo "kime installed successfully using yay."
+else
+    echo "yay installation failed. Attempting manual build..."
 
-# Clone the kime repository
-cd /tmp
-git clone https://aur.archlinux.org/kime.git
-cd kime
+    # Clone the official kime repository
+    cd /tmp
+    git clone https://github.com/Riey/kime.git
+    cd kime
 
-# Build and install kime
-cargo build --release
-sudo cp target/release/kime /usr/bin/
-sudo cp target/release/kime_engine /usr/lib/
+    # Build and install kime
+    echo "Building kime from source..."
+    cargo build --release
+    sudo cp target/release/kime /usr/bin/
+    sudo cp target/release/kime_engine /usr/lib/
 
-# kime 설치
-echo "Installing kime..."
-yay -S --noconfirm kime
+    echo "kime installed successfully from source."
+fi
 
 # kime 설정 디렉토리 생성
 echo "Configuring kime..."
