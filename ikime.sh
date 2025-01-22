@@ -40,7 +40,7 @@ yay -S --noconfirm kime kime-bin
 
 # fcitx5 제거
 echo "Uninstalling fcitx5..."
-sudo pacman -Rns --noconfirm fcitx5 fcitx5-configtool fcitx5-gtk fcitx5-qt fcitx5-mozc
+sudo pacman -Rns --noconfirm fcitx5 fcitx5-configtool fcitx5-gtk fcitx5-qt
 
 # 빌드 스크립트 실행
 echo "Running build script..."
