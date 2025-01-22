@@ -31,7 +31,7 @@ echo "yay installation complete!"
 
 # kime 설치 및 설정
 echo "Installing and configuring kime..."
-cd ~/Downloads || cd ~/다운로드  # Try English directory first, then Korean
+cd ~/다운로드  # Try English directory first, then Korean
 if [ -d "kime" ]; then
     echo "kime directory already exists. Updating..."
     cd kime
