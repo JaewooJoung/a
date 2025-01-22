@@ -51,6 +51,7 @@ else
 
     # Clone the official kime repository
     cd /tmp
+    rm -rf kime  # Remove any existing kime directory
     git clone https://github.com/Riey/kime.git
     cd kime
 
@@ -58,7 +59,7 @@ else
     echo "Building kime from source..."
     cargo build --release
     sudo cp target/release/kime /usr/bin/
-    sudo cp target/release/kime_engine /usr/lib/
+    sudo cp target/release/libkime_engine.so /usr/lib/
 
     echo "kime installed successfully from source."
 fi
