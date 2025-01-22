@@ -255,89 +255,19 @@ mkdir -p /mnt/boot
 mount ${EFI_PART} /mnt/boot
 swapon ${SWAP_PART}
 
-# 기본 시스템 설치
 clear
 # 기본 시스템 설치
 echo "Installing base system..."
-pacstrap -K /mnt \
-    # 핵심 시스템 구성요소
-    base linux linux-firmware base-devel ${CPU_UCODE} \
-    # 네트워크 관련
-    networkmanager \
-    # 시스템 유틸리티
-    sudo vim less htop \
-    # 부트로더 및 시스템 도구
-    efibootmgr btrfs-progs \
-    # 기본 개발 도구
-    git base-devel cmake pkg-config clang \
+pacstrap -K /mnt base linux linux-firmware base-devel ${CPU_UCODE} \
+    networkmanager terminus-font vim efibootmgr \
+    pipewire pipewire-alsa pipewire-jack \
+    reflector dhcpcd bash-completion \
+    sudo btrfs-progs htop pacman-contrib pkgfile less \
+    git curl wget zsh openssh man-db \
+    xorg xorg-server xorg-apps xorg-drivers xorg-xkill xorg-xinit xterm \
+    mesa libx11 libxft libxinerama freetype2 noto-fonts-emoji usbutils xdg-user-dirs \
+    konsole bluez bluez-utils blueman --noconfirm
     
-# 오디오 시스템
-echo "Installing audio system..."
-pacstrap -K /mnt \
-    pipewire pipewire-alsa pipewire-pulse pipewire-jack \
-    
-# X11/Wayland 기본 구성요소
-echo "Installing display system..."
-pacstrap -K /mnt \
-    xorg xorg-server mesa \
-    libx11 libxft libxinerama \
-    qt5-base qt6-base \
-    gtk3 gtk4 \
-    libxcb libdbus libxkbcommon \
-    
-# 폰트
-echo "Installing fonts..."
-pacstrap -K /mnt \
-    noto-fonts-cjk \
-    adobe-source-han-sans-kr-fonts \
-    adobe-source-han-serif-kr-fonts \
-    ttf-baekmuk \
-    nerd-fonts \
-    ttf-lato \
-    
-# 한글 입력기 (kime로 교체 예정)
-echo "Installing Korean input method..."
-pacstrap -K /mnt \
-    libhangul \
-    
-# 개발 도구 및 프로그래밍 언어
-echo "Installing development tools..."
-pacstrap -K /mnt \
-    python \
-    cargo \
-    gcc-fortran \
-    cmake \
-    git \
-    
-# 필수 애플리케이션
-echo "Installing essential applications..."
-pacstrap -K /mnt \
-    firefox \
-    thunderbird thunderbird-i18n-ko \
-    code \
-    libreoffice-fresh libreoffice-fresh-ko \
-    
-# 시스템 유틸리티
-echo "Installing system utilities..."
-pacstrap -K /mnt \
-    bluez bluez-utils \
-    xdg-user-dirs \
-    flatpak \
-    ghostty \
-    7zip \
-    
-# Julia 관련 패키지
-echo "Installing Julia dependencies..."
-pacstrap -K /mnt \
-    blas64-openblas \
-    fftw \
-    libgit2 \
-    libunwind \
-    libutf8proc \
-    llvm-julia-libs \
-    openlibm \
-    pcre2 \
-    suitesparse
 # fstab 생성
 clear
 echo "Generating fstab..."
@@ -440,6 +370,25 @@ EOF
 # 추가 패키지 설치
 clear
 pacman -Sy --noconfirm
+
+# 한글 폰트 및 입력기 설치
+pacman -S --noconfirm \
+    noto-fonts-cjk noto-fonts-emoji \
+    adobe-source-han-sans-kr-fonts adobe-source-han-serif-kr-fonts ttf-baekmuk \
+    powerline-fonts nerd-fonts ttf-lato \
+    libhangul fcitx5 fcitx5-configtool fcitx5-hangul fcitx5-gtk fcitx5-qt \
+    libreoffice-fresh libreoffice-fresh-ko
+    fcitx-hangul firefox-i18n-ko gimp-help-ko ibus-hangul 
+    texlive-langcjk texlive-langkorean thunderbird-i18n-ko ttf-baekmuk
+
+# 프로그래밍 언어 및 개발 도구 설치
+pacman -S --noconfirm \
+    firefox thunderbird thunderbird-i18n-ko \
+    flatpak remmina opentofu chromium code \
+    describeimage fortunecraft llm-manager ollama ollama-docs ghostty \
+    7zip blas64-openblas fftw libblastrampoline libgit2 libunwind libutf8proc lld llvm-julia-libs mbedtls2 openlibm pcre2 suitesparse \
+    gnuplot cmake gcc-fortran libwhich llvm-julia patchelf python git base-devel cmake pkg-config \
+    gtk3 gtk4 qt5-base qt6-base libxcb libdbus fontconfig freetype2 libxkbcommon clang noto-fonts-cjk cargo
 
 # fcitx5 한글 입력기 프로필 구성
 cat > /home/${USERNAME}/.config/fcitx5/profile <<EOF
