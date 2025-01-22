@@ -12,7 +12,7 @@ echo "Installing dependencies..."
 sudo pacman -S --needed --noconfirm \
     git base-devel gcc clang cmake pkg-config \
     gtk3 gtk4 qt5-base qt6-base libxcb libdbus fontconfig freetype2 libxkbcommon wayland \
-    noto-fonts-cjk cairo cargo dbus llvm
+    noto-fonts-cjk cairo cargo dbus llvm 
 
 # Rust 설치
 echo "Installing Rust..."
@@ -35,7 +35,7 @@ cd ~/다운로드  #  Korean
 
 # kime, kime-bin, zoom-libkime 설치
 echo "Installing kime, kime-bin, and zoom-libkime using yay..."
-yay -S --noconfirm kime kime-bin
+yay -S --noconfirm kime kime-bin zoom zoom-libkime
 
 
 # fcitx5 제거
