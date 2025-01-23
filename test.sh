@@ -386,7 +386,7 @@ pacman -S --noconfirm \
     flatpak remmina opentofu chromium code \
     describeimage fortunecraft llm-manager ollama ollama-docs ghostty \
     7zip blas64-openblas fftw libblastrampoline libgit2 libunwind libutf8proc lld llvm-julia-libs mbedtls2 openlibm pcre2 suitesparse \
-    gnuplot cmake gcc-fortran libwhich llvm-julia patchelf python git base-devel cmake pkg-config 
+    gnuplot cmake gcc-fortran libwhich llvm-julia patchelf python git base-devel cmake pkg-config perl
 
 
 # 설정 파일의 소유권을 사용자로 변경
@@ -413,7 +413,4 @@ echo "   b. Disable Secure Boot"
 echo "   c. Set UEFI boot mode (disable CSM/Legacy completely)"
 echo "   d. Set Boot Device Priority to ${DEVICE}"
 echo ""
-echo "After first boot:"
-echo "1. Korean input can be toggled with Shift+Space"
-echo "2. Run 'fcitx5-configtool' to configure input method"
-echo "3. Use 'fcitx5 --debug &' if you need to troubleshoot"
+
