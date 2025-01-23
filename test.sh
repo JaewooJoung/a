@@ -376,10 +376,10 @@ pacman -S --noconfirm \
     noto-fonts-cjk noto-fonts-emoji \
     adobe-source-han-sans-kr-fonts adobe-source-han-serif-kr-fonts ttf-baekmuk \
     powerline-fonts nerd-fonts ttf-lato \
-    libhangul fcitx5 fcitx5-configtool fcitx5-hangul fcitx5-gtk fcitx5-qt \
-    libreoffice-fresh libreoffice-fresh-ko
-    fcitx-hangul firefox-i18n-ko gimp-help-ko ibus-hangul 
-    texlive-langcjk texlive-langkorean thunderbird-i18n-ko ttf-baekmuk
+    libhangul gimp gimp-help-ko \
+    libreoffice-fresh libreoffice-fresh-ko \
+    fcitx-hangul firefox-i18n-ko \
+    thunderbird-i18n-ko ttf-baekmuk
 
 # 프로그래밍 언어 및 개발 도구 설치
 pacman -S --noconfirm \
@@ -387,8 +387,7 @@ pacman -S --noconfirm \
     flatpak remmina opentofu chromium code \
     describeimage fortunecraft llm-manager ollama ollama-docs ghostty \
     7zip blas64-openblas fftw libblastrampoline libgit2 libunwind libutf8proc lld llvm-julia-libs mbedtls2 openlibm pcre2 suitesparse \
-    gnuplot cmake gcc-fortran libwhich llvm-julia patchelf python git base-devel cmake pkg-config \
-    gtk3 gtk4 qt5-base qt6-base libxcb libdbus fontconfig freetype2 libxkbcommon clang noto-fonts-cjk cargo
+    gnuplot cmake gcc-fortran libwhich llvm-julia patchelf python git base-devel cmake pkg-config 
 
 
 # 설정 파일의 소유권을 사용자로 변경
