@@ -10,9 +10,7 @@ sudo pacman -Syu --noconfirm
 # 필요한 종속성 설치
 echo "Installing dependencies..."
 sudo pacman -S --needed --noconfirm \
-    git base-devel gcc clang cmake pkg-config \
-    gtk3 gtk4 qt5-base qt6-base libxcb libdbus fontconfig freetype2 libxkbcommon wayland \
-    noto-fonts-cjk cairo cargo dbus llvm 
+    noto-fonts-cjk cairo cmake extra-cmake-modules pkg-config dbus gtk3 gtk4 libxcb qt5-base qt6-base
 
 # Rust 설치
 echo "Installing Rust..."
@@ -118,9 +116,3 @@ pkill kime || true  # 기존의 kime 프로세스 종료
 kime &
 
 echo "kime installation and configuration complete!"
-
-# Julia 설치
-echo "Installing Julia..."
-curl -fsSL https://install.julialang.org | sh
-
-echo "Julia installation complete!"
