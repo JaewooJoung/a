@@ -378,8 +378,7 @@ pacman -S --noconfirm \
     powerline-fonts nerd-fonts ttf-lato \
     libhangul gimp gimp-help-ko \
     libreoffice-fresh libreoffice-fresh-ko \
-    fcitx-hangul firefox-i18n-ko \
-    thunderbird-i18n-ko ttf-baekmuk
+    firefox-i18n-ko thunderbird-i18n-ko ttf-baekmuk
 
 # 프로그래밍 언어 및 개발 도구 설치
 pacman -S --noconfirm \
