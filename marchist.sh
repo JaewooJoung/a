@@ -48,11 +48,6 @@ create_myarch_json() {
         "sys_enc": "UTF-8",
         "sys_lang": "LOCALE_PLACEHOLDER"
     },
-    "mirror_config": {
-        "mirror-regions": {
-            "Worldwide": []
-        }
-    },
     "network_config": {
         "type": "nm",
         "nics": [
@@ -72,7 +67,6 @@ create_myarch_json() {
         }
     },
     "timezone": "TIMEZONE_PLACEHOLDER",
-    "version": "2.8.6",
     "user": {
         "username": "USERNAME_PLACEHOLDER",
         "password": "USER_PASSWORD_PLACEHOLDER",
@@ -82,7 +76,7 @@ create_myarch_json() {
 }
 EOF
 
-    # Replace placeholders with actual values
+    # Replace placeholders
     sed -i "s/LANGUAGE_PLACEHOLDER/$LANGUAGE/g" myarch.json
     sed -i "s|DEVICE_PLACEHOLDER|$DEVICE|g" myarch.json
     sed -i "s/HOSTNAME_PLACEHOLDER/$HOSTNAME/g" myarch.json
