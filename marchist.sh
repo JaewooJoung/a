@@ -21,11 +21,19 @@ create_myarch_json() {
                         "btrfs": [],
                         "flags": ["boot"],
                         "fs_type": "fat32",
-                        "size": {"unit": "MiB", "value": 512, "sector_size": {"unit": "B", "value": 512}},
+                        "size": {
+                            "sector_size": null,
+                            "unit": "MiB",
+                            "value": 512
+                        },
                         "mount_options": [],
                         "mountpoint": "/boot",
                         "obj_id": "2c3fa2d5-2c79-4fab-86ec-22d0ea1543c0",
-                        "start": {"unit": "MiB", "value": 1, "sector_size": {"unit": "B", "value": 512}},
+                        "start": {
+                            "sector_size": null,
+                            "unit": "MiB",
+                            "value": 1
+                        },
                         "status": "create",
                         "type": "primary"
                     },
@@ -33,11 +41,19 @@ create_myarch_json() {
                         "btrfs": [],
                         "flags": [],
                         "fs_type": "ext4",
-                        "size": {"unit": "GiB", "value": 20, "sector_size": {"unit": "B", "value": 512}},
+                        "size": {
+                            "sector_size": null,
+                            "unit": "GiB",
+                            "value": 20
+                        },
                         "mount_options": [],
                         "mountpoint": "/",
                         "obj_id": "3e7018a0-363b-4d05-ab83-8e82d13db208",
-                        "start": {"unit": "MiB", "value": 513, "sector_size": {"unit": "B", "value": 512}},
+                        "start": {
+                            "sector_size": null,
+                            "unit": "MiB",
+                            "value": 513
+                        },
                         "status": "create",
                         "type": "primary"
                     },
@@ -45,11 +61,19 @@ create_myarch_json() {
                         "btrfs": [],
                         "flags": [],
                         "fs_type": "ext4",
-                        "size": {"unit": "Percent", "value": 100, "sector_size": {"unit": "B", "value": 512}},
+                        "size": {
+                            "sector_size": null,
+                            "unit": "Percent",
+                            "value": 100
+                        },
                         "mount_options": [],
                         "mountpoint": "/home",
                         "obj_id": "ce58b139-f041-4a06-94da-1f8bad775d3f",
-                        "start": {"unit": "GiB", "value": 20, "sector_size": {"unit": "B", "value": 512}},
+                        "start": {
+                            "sector_size": null,
+                            "unit": "GiB",
+                            "value": 20
+                        },
                         "status": "create",
                         "type": "primary"
                     }
