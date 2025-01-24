@@ -17,27 +17,69 @@ create_myarch_json() {
         "device_modifications": [
             {
                 "device": "DEVICE_PLACEHOLDER",
-                "wipe": true,
                 "partitions": [
                     {
+                        "btrfs": [],
+                        "flags": ["boot"],
                         "fs_type": "fat32",
+                        "size": {
+                            "sector_size": null,
+                            "unit": "MiB",
+                            "value": 512
+                        },
+                        "mount_options": [],
                         "mountpoint": "/boot",
-                        "size": {"unit": "MiB", "value": 512},
+                        "obj_id": "2c3fa2d5-2c79-4fab-86ec-22d0ea1543c0",
+                        "start": {
+                            "sector_size": null,
+                            "unit": "MiB",
+                            "value": 1
+                        },
+                        "status": "create",
                         "type": "primary"
                     },
                     {
+                        "btrfs": [],
+                        "flags": [],
                         "fs_type": "ext4",
+                        "size": {
+                            "sector_size": null,
+                            "unit": "GiB",
+                            "value": 20
+                        },
+                        "mount_options": [],
                         "mountpoint": "/",
-                        "size": {"unit": "GiB", "value": 20},
+                        "obj_id": "3e7018a0-363b-4d05-ab83-8e82d13db208",
+                        "start": {
+                            "sector_size": null,
+                            "unit": "MiB",
+                            "value": 513
+                        },
+                        "status": "create",
                         "type": "primary"
                     },
                     {
+                        "btrfs": [],
+                        "flags": [],
                         "fs_type": "ext4",
+                        "size": {
+                            "sector_size": null,
+                            "unit": "Percent",
+                            "value": 100
+                        },
+                        "mount_options": [],
                         "mountpoint": "/home",
-                        "size": {"unit": "GiB", "value": 0},
+                        "obj_id": "ce58b139-f041-4a06-94da-1f8bad775d3f",
+                        "start": {
+                            "sector_size": null,
+                            "unit": "GiB",
+                            "value": 20
+                        },
+                        "status": "create",
                         "type": "primary"
                     }
-                ]
+                ],
+                "wipe": true
             }
         ]
     },
@@ -48,13 +90,22 @@ create_myarch_json() {
         "sys_enc": "UTF-8",
         "sys_lang": "LOCALE_PLACEHOLDER"
     },
+    "mirror_config": {
+        "mirror-regions": {
+            "Australia": [
+                "http://archlinux.mirror.digitalpacific.com.au/$repo/os/$arch"
+            ]
+        }
+    },
     "network_config": {
-        "type": "nm",
+        "type": "manual",
         "nics": [
             {
                 "iface": "INTERFACE_PLACEHOLDER",
+                "ip": "192.168.1.15/24",
                 "dhcp": true,
-                "dns": ["1.1.1.1", "8.8.8.8"]
+                "gateway": "192.168.1.1",
+                "dns": ["192.168.1.1", "9.9.9.9"]
             }
         ]
     },
@@ -67,12 +118,7 @@ create_myarch_json() {
         }
     },
     "timezone": "TIMEZONE_PLACEHOLDER",
-    "user": {
-        "username": "USERNAME_PLACEHOLDER",
-        "password": "USER_PASSWORD_PLACEHOLDER",
-        "sudo": true
-    },
-    "!root-password": "ROOT_PASSWORD_PLACEHOLDER"
+    "version": "2.8.6"
 }
 EOF
 
@@ -85,11 +131,7 @@ EOF
     sed -i "s/GREETER_PLACEHOLDER/$GREETER/g" myarch.json
     sed -i "s/DE_PLACEHOLDER/$DESKTOP_ENVIRONMENT/g" myarch.json
     sed -i "s|TIMEZONE_PLACEHOLDER|$TIMEZONE|g" myarch.json
-    sed -i "s/USERNAME_PLACEHOLDER/$USERNAME/g" myarch.json
-    sed -i "s/USER_PASSWORD_PLACEHOLDER/$USER_PASSWORD/g" myarch.json
-    sed -i "s/ROOT_PASSWORD_PLACEHOLDER/$ROOT_PASSWORD/g" myarch.json
 }
-
 # 언어 선택
 clear
 echo "Select your language:"
