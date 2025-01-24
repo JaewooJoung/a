@@ -61,8 +61,8 @@ create_myarch_json() {
     "hostname": "$HOSTNAME",
     "kernels": ["linux"],
     "locale_config": {
-        "kb_layout": "us",  # 기본 키보드 레이아웃은 영어(us)로 설정
-        "kb_variants": ["kr", "es", "cn", "se"],  # 추가 키보드 레이아웃
+        "kb_layout": "us",
+        "kb_variants": ["kr", "es", "cn", "se"],
         "sys_enc": "UTF-8",
         "sys_lang": "$LOCALE"
     },
@@ -75,7 +75,7 @@ create_myarch_json() {
         "type": "manual",
         "nics": [
             {
-                "iface": "eno1",
+                "iface": "$SELECTED_INTERFACE",
                 "ip": "192.168.1.15/24",
                 "dhcp": true,
                 "gateway": "192.168.1.1",
@@ -387,6 +387,31 @@ if [ "$USERNAME" != "crux" ]; then
     done
 fi
 
+# 이더넷 인터페이스 선택
+clear
+echo "Detecting network interfaces..."
+INTERFACES=($(ls /sys/class/net | grep -v lo))  # lo (루프백 인터페이스) 제외
+if [ ${#INTERFACES[@]} -eq 0 ]; then
+    echo "No network interfaces found. Exiting..."
+    exit 1
+fi
+
+echo "Available network interfaces:"
+for i in "${!INTERFACES[@]}"; do
+    echo "$((i+1)). ${INTERFACES[$i]}"
+done
+
+read -p "Please enter the number of the desired network interface (e.g., 1, 2, etc.): " iface_choice
+
+# 선택 유효성 검사
+if [[ $iface_choice -gt 0 && $iface_choice -le ${#INTERFACES[@]} ]]; then
+    SELECTED_INTERFACE="${INTERFACES[$iface_choice-1]}"
+    echo "Selected network interface: $SELECTED_INTERFACE"
+else
+    echo "Invalid number. Exiting..."
+    exit 1
+fi
+
 # 장치 유형에 따른 파티션 변수 설정
 if [[ ${DEVICE} == *"nvme"* ]]; then
     EFI_PART="${DEVICE}p1"
@@ -438,6 +463,7 @@ echo "Keyboard Layout: ${KEYBOARD_LAYOUT} (with variants: ${KEYBOARD_VARIANTS[@]
 echo "Desktop Environment: ${DESKTOP_ENVIRONMENT}"
 echo "Greeter: ${GREETER}"
 echo "Timezone: ${TIMEZONE}"
+echo "Network Interface: ${SELECTED_INTERFACE}"
 echo "==========================="
 echo "WARNING: This will COMPLETELY ERASE the selected drive!"
 echo "Press Ctrl+C within 3 seconds to cancel..."
