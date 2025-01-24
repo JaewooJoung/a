@@ -1,13 +1,14 @@
 #!/bin/bash
 
 # JSON 파일 생성 함수
+# Modified JSON creation function
 create_myarch_json() {
-    cat <<EOF > myarch.json
+    cat > myarch.json << 'EOF'
 {
     "__separator__": null,
     "config_version": "2.8.6",
     "additional-repositories": [],
-    "archinstall-language": "$LANGUAGE",
+    "archinstall-language": "LANGUAGE_PLACEHOLDER",
     "audio_config": {"audio": "pipewire"},
     "bootloader": "Systemd-boot",
     "debug": false,
@@ -15,118 +16,80 @@ create_myarch_json() {
         "config_type": "default_layout",
         "device_modifications": [
             {
-                "device": "$DEVICE",
+                "device": "DEVICE_PLACEHOLDER",
                 "partitions": [
                     {
                         "btrfs": [],
                         "flags": ["boot"],
                         "fs_type": "fat32",
-                        "size": {
-                            "sector_size": null,
-                            "unit": "MiB",
-                            "value": 512
-                        },
-                        "mount_options": [],
-                        "mountpoint": "/boot",
-                        "obj_id": "2c3fa2d5-2c79-4fab-86ec-22d0ea1543c0",
-                        "start": {
-                            "sector_size": null,
-                            "unit": "MiB",
-                            "value": 1
-                        },
-                        "status": "create",
-                        "type": "primary"
+                        "size": {"unit": "MiB", "value": 512},
+                        "mountpoint": "/boot"
                     },
                     {
                         "btrfs": [],
                         "flags": [],
                         "fs_type": "ext4",
-                        "size": {
-                            "sector_size": null,
-                            "unit": "GiB",
-                            "value": 20
-                        },
-                        "mount_options": [],
-                        "mountpoint": "/",
-                        "obj_id": "3e7018a0-363b-4d05-ab83-8e82d13db208",
-                        "start": {
-                            "sector_size": null,
-                            "unit": "MiB",
-                            "value": 513
-                        },
-                        "status": "create",
-                        "type": "primary"
-                    },
-                    {
-                        "btrfs": [],
-                        "flags": [],
-                        "fs_type": "ext4",
-                        "size": {
-                            "sector_size": null,
-                            "unit": "Percent",
-                            "value": 100
-                        },
-                        "mount_options": [],
-                        "mountpoint": "/home",
-                        "obj_id": "ce58b139-f041-4a06-94da-1f8bad775d3f",
-                        "start": {
-                            "sector_size": null,
-                            "unit": "GiB",
-                            "value": 20
-                        },
-                        "status": "create",
-                        "type": "primary"
+                        "size": {"unit": "GiB", "value": 20},
+                        "mountpoint": "/"
                     }
                 ],
                 "wipe": true
             }
         ]
     },
-    "hostname": "$HOSTNAME",
+    "hostname": "HOSTNAME_PLACEHOLDER",
     "kernels": ["linux"],
     "locale_config": {
         "kb_layout": "us",
-        "kb_variants": ["kr", "es", "cn", "se"],
         "sys_enc": "UTF-8",
-        "sys_lang": "$LOCALE"
+        "sys_lang": "LOCALE_PLACEHOLDER"
     },
     "mirror_config": {
         "mirror-regions": {
-            "Australia": ["http://archlinux.mirror.digitalpacific.com.au/\$repo/os/\$arch"]
+            "Worldwide": []
         }
     },
     "network_config": {
-        "type": "manual",
+        "type": "nm",
         "nics": [
             {
-                "iface": "$SELECTED_INTERFACE",
-                "ip": "192.168.1.15/24",
+                "iface": "INTERFACE_PLACEHOLDER",
                 "dhcp": true,
-                "gateway": "192.168.1.1",
-                "dns": ["192.168.1.1", "9.9.9.9"]
+                "dns": ["1.1.1.1", "8.8.8.8"]
             }
         ]
     },
-    "no_pkg_lookups": false,
-    "ntp": true,
-    "offline": false,
-    "packages": [],
-    "parallel downloads": 0,
     "profile_config": {
         "gfx_driver": "All open-source (default)",
-        "greeter": "$GREETER",
+        "greeter": "GREETER_PLACEHOLDER",
         "profile": {
-            "details": ["$DESKTOP_ENVIRONMENT"],
+            "details": ["DE_PLACEHOLDER"],
             "main": "Desktop"
         }
     },
-    "script": "guided",
-    "silent": false,
-    "swap": true,
-    "timezone": "$TIMEZONE",
-    "version": "2.8.6"
+    "timezone": "TIMEZONE_PLACEHOLDER",
+    "version": "2.8.6",
+    "user": {
+        "username": "USERNAME_PLACEHOLDER",
+        "password": "USER_PASSWORD_PLACEHOLDER",
+        "sudo": true
+    },
+    "!root-password": "ROOT_PASSWORD_PLACEHOLDER"
 }
 EOF
+
+    # Replace placeholders with actual values
+    sed -i "s/LANGUAGE_PLACEHOLDER/$LANGUAGE/g" myarch.json
+    sed -i "s|DEVICE_PLACEHOLDER|$DEVICE|g" myarch.json
+    sed -i "s/HOSTNAME_PLACEHOLDER/$HOSTNAME/g" myarch.json
+    sed -i "s/LOCALE_PLACEHOLDER/$LOCALE/g" myarch.json
+    sed -i "s/INTERFACE_PLACEHOLDER/$SELECTED_INTERFACE/g" myarch.json
+    sed -i "s/GREETER_PLACEHOLDER/$GREETER/g" myarch.json
+    sed -i "s/DE_PLACEHOLDER/$DESKTOP_ENVIRONMENT/g" myarch.json
+    sed -i "s|TIMEZONE_PLACEHOLDER|$TIMEZONE|g" myarch.json
+    sed -i "s/USERNAME_PLACEHOLDER/$USERNAME/g" myarch.json
+    sed -i "s/USER_PASSWORD_PLACEHOLDER/$USER_PASSWORD/g" myarch.json
+    sed -i "s/ROOT_PASSWORD_PLACEHOLDER/$ROOT_PASSWORD/g" myarch.json
 }
 
 # 언어 선택
