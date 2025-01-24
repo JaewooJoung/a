@@ -152,6 +152,60 @@ else
     SWAPPINESS=60  # 낮은 RAM 시스템의 경우 높은 스왑성
 fi
 
+clear
+echo "=== Timezone and Language Setup ==="
+echo
+
+# Timezone selection
+echo "Choose your timezone by number:"
+echo "1) Stockholm"
+echo "2) Seoul"
+echo "3) Shanghai"
+echo "4) New York"
+echo
+
+while true; do
+    read -p "Enter timezone number (1-4): " tz_choice
+    case $tz_choice in
+        1) timezone="/usr/share/zoneinfo/Europe/Stockholm"; break;;
+        2) timezone="/usr/share/zoneinfo/Asia/Seoul"; break;;
+        3) timezone="/usr/share/zoneinfo/Asia/Shanghai"; break;;
+        4) timezone="/usr/share/zoneinfo/America/New_York"; break;;
+        *) echo "Please enter a number between 1 and 4";;
+    esac
+done
+
+echo
+echo "Choose your language by number:"
+echo "1) Korean"
+echo "2) Swedish"
+echo "3) Chinese"
+echo "4) English US"
+echo
+
+while true; do
+    read -p "Enter language number (1-4): " lang_choice
+    case $lang_choice in
+        1) 
+            locale="ko_KR.UTF-8"
+            lang_packages="libhangul noto-fonts-cjk noto-fonts-emoji powerline-fonts nerd-fonts ttf-lato adobe-source-han-sans-kr-fonts adobe-source-han-serif-kr-fonts ttf-baekmuk libreoffice-fresh-ko gimp-help-ko firefox-i18n-ko thunderbird-i18n-ko"
+            break;;
+        2) 
+            locale="sv_SE.UTF-8"
+            lang_packages="libreoffice-fresh-sv gimp-help-sv firefox-i18n-sv-se thunderbird-i18n-sv-se"
+            break;;
+        3) 
+            locale="zh_CN.UTF-8"
+            lang_packages="adobe-source-han-sans-cn-fonts adobe-source-han-serif-cn-fonts ttf-liberation libreoffice-fresh-zh-cn gimp-help-zh_cn firefox-i18n-zh-cn thunderbird-i18n-zh-cn"
+            break;;
+        4) 
+            locale="en_US.UTF-8"
+            lang_packages="ttf-liberation"
+            break;;
+        *) echo "Please enter a number between 1 and 4";;
+    esac
+done
+
 # 설치 계획 표시
 echo "==========================="
 echo "Installation Plan:"
@@ -163,6 +217,8 @@ echo "Root: ${ROOT_PART}"
 echo "Username: ${USERNAME}"
 echo "Hostname: ${HOSTNAME}"
 echo "CPU Type: ${CPU_UCODE}"
+echo "Timezone: ${timezone#/usr/share/zoneinfo/}"
+echo "Language: ${locale}"
 echo "==========================="
 echo "WARNING: This will COMPLETELY ERASE the selected drive!"
 echo "Press Ctrl+C within 3 seconds to cancel..."
@@ -354,17 +410,19 @@ arch-chroot /mnt systemctl enable NetworkManager
 
 # 시스템 구성
 arch-chroot /mnt /bin/bash <<CHROOT_COMMANDS
-# 시간대를 대한민국으로 설정
-ln -sf /usr/share/zoneinfo/Asia/Seoul /etc/localtime
+
+
+# Set timezone
+ln -sf ${timezone} /etc/localtime
 hwclock --systohc
 
-# 시간 동기화 활성화
+# Enable time synchronization
 systemctl enable systemd-timesyncd
 
-# 로케일 설정
-echo "ko_KR.UTF-8 UTF-8" >> /etc/locale.gen
+# Set locale
+echo "${locale} UTF-8" >> /etc/locale.gen
 locale-gen
-echo "LANG=ko_KR.UTF-8" > /etc/locale.conf
+echo "LANG=${locale}" > /etc/locale.conf
 
 # 호스트명 설정
 echo "${HOSTNAME}" > /etc/hostname
@@ -588,23 +646,15 @@ EOF
 clear
 pacman -Sy --noconfirm
 
-# 한글 폰트 및 입력기 설치
-pacman -S --noconfirm \
-    noto-fonts-cjk noto-fonts-emoji \
-    adobe-source-han-sans-kr-fonts adobe-source-han-serif-kr-fonts ttf-baekmuk \
-    powerline-fonts nerd-fonts ttf-lato \
-    libhangul gimp gimp-help-ko \
-    libreoffice-fresh libreoffice-fresh-ko \
-    firefox-i18n-ko thunderbird-i18n-ko ttf-baekmuk
-
 # 프로그래밍 언어 및 개발 도구 설치
 pacman -S --noconfirm \
-    firefox thunderbird thunderbird-i18n-ko \
-    flatpak remmina opentofu chromium code \
+    gimp libreoffice-fresh firefox thunderbird flatpak opentofu chromium code \
     describeimage fortunecraft llm-manager ollama ollama-docs ghostty \
     7zip blas64-openblas fftw libblastrampoline libgit2 libunwind libutf8proc lld llvm-julia-libs mbedtls2 openlibm pcre2 suitesparse \
     gnuplot cmake gcc-fortran libwhich llvm-julia patchelf python git base-devel cmake pkg-config perl
 
+# 알맞는 입력기 와 언어도움 설치
+pacman -S --noconfirm ${lang_packages}
 
 # 설정 파일의 소유권을 사용자로 변경
 chown -R ${USERNAME}:${USERNAME} /home/${USERNAME}/.config
