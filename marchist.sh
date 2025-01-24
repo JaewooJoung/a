@@ -17,23 +17,27 @@ create_myarch_json() {
         "device_modifications": [
             {
                 "device": "DEVICE_PLACEHOLDER",
+                "wipe": true,
                 "partitions": [
                     {
-                        "btrfs": [],
-                        "flags": ["boot"],
                         "fs_type": "fat32",
+                        "mountpoint": "/boot",
                         "size": {"unit": "MiB", "value": 512},
-                        "mountpoint": "/boot"
+                        "type": "primary"
                     },
                     {
-                        "btrfs": [],
-                        "flags": [],
                         "fs_type": "ext4",
+                        "mountpoint": "/",
                         "size": {"unit": "GiB", "value": 20},
-                        "mountpoint": "/"
+                        "type": "primary"
+                    },
+                    {
+                        "fs_type": "ext4",
+                        "mountpoint": "/home",
+                        "size": {"unit": "GiB", "value": 0},
+                        "type": "primary"
                     }
-                ],
-                "wipe": true
+                ]
             }
         ]
     },
