@@ -112,7 +112,7 @@ NoDisplay=false
 X-GNOME-Autostart-enabled=true
 Name[en_US]=kime
 Name=kime
-Comment[en_US]=한글 입력기
+Comment[en_US]=Korean Input Method Editor
 Comment=한글 입력기
 EOL
 
