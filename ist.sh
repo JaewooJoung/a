@@ -409,6 +409,157 @@ AutomaticLogin=${USERNAME}
 EOF
         ;;
         
+    3)  # XFCE (LightDM)
+        mkdir -p /etc/lightdm
+        cat > /etc/lightdm/lightdm.conf <<EOF
+[Seat:*]
+autologin-user=${USERNAME}
+autologin-session=xfce
+EOF
+        ;;
+        
+    4)  # Awesome WM (LightDM)
+        mkdir -p /etc/lightdm
+        cat > /etc/lightdm/lightdm.conf <<EOF
+[Seat:*]
+autologin-user=${USERNAME}
+autologin-session=awesome
+EOF
+        ;;
+        
+    5)  # DWM
+        # DWM은 자동 로그인을 지원하지 않음
+        ;;
+        
+    6)  # Cinnamon (LightDM)
+        mkdir -p /etc/lightdm
+        cat > /etc/lightdm/lightdm.conf <<EOF
+[Seat:*]
+autologin-user=${USERNAME}
+autologin-session=cinnamon
+EOF
+        ;;
+        
+    7)  # Hyprland (SDDM)
+        mkdir -p /etc/sddm.conf.d
+        cat > /etc/sddm.conf.d/autologin.conf <<EOF
+[Autologin]
+User=${USERNAME}
+Session=hyprland.desktop
+Relogin=false
+EOF
+        ;;
+        
+    8)  # Bspwm (LightDM)
+        mkdir -p /etc/lightdm
+        cat > /etc/lightdm/lightdm.conf <<EOF
+[Seat:*]
+autologin-user=${USERNAME}
+autologin-session=bspwm
+EOF
+        ;;
+        
+    9)  # Budgie (LightDM)
+        mkdir -p /etc/lightdm
+        cat > /etc/lightdm/lightdm.conf <<EOF
+[Seat:*]
+autologin-user=${USERNAME}
+autologin-session=budgie-desktop
+EOF
+        ;;
+        
+    10) # Cosmic Epoch (SDDM)
+        mkdir -p /etc/sddm.conf.d
+        cat > /etc/sddm.conf.d/autologin.conf <<EOF
+[Autologin]
+User=${USERNAME}
+Session=cosmic.desktop
+Relogin=false
+EOF
+        ;;
+        
+    11) # Cutefish (SDDM)
+        mkdir -p /etc/sddm.conf.d
+        cat > /etc/sddm.conf.d/autologin.conf <<EOF
+[Autologin]
+User=${USERNAME}
+Session=cutefish.desktop
+Relogin=false
+EOF
+        ;;
+        
+    12) # Deepin (LightDM)
+        mkdir -p /etc/lightdm
+        cat > /etc/lightdm/lightdm.conf <<EOF
+[Seat:*]
+autologin-user=${USERNAME}
+autologin-session=deepin
+EOF
+        ;;
+        
+    13) # Enlightenment (LightDM)
+        mkdir -p /etc/lightdm
+        cat > /etc/lightdm/lightdm.conf <<EOF
+[Seat:*]
+autologin-user=${USERNAME}
+autologin-session=enlightenment
+EOF
+        ;;
+        
+    14) # i3-wm (LightDM)
+        mkdir -p /etc/lightdm
+        cat > /etc/lightdm/lightdm.conf <<EOF
+[Seat:*]
+autologin-user=${USERNAME}
+autologin-session=i3
+EOF
+        ;;
+        
+    15) # LXQt (LightDM)
+        mkdir -p /etc/lightdm
+        cat > /etc/lightdm/lightdm.conf <<EOF
+[Seat:*]
+autologin-user=${USERNAME}
+autologin-session=lxqt
+EOF
+        ;;
+        
+    16) # MATE (LightDM)
+        mkdir -p /etc/lightdm
+        cat > /etc/lightdm/lightdm.conf <<EOF
+[Seat:*]
+autologin-user=${USERNAME}
+autologin-session=mate
+EOF
+        ;;
+        
+    17) # Qtile (LightDM)
+        mkdir -p /etc/lightdm
+        cat > /etc/lightdm/lightdm.conf <<EOF
+[Seat:*]
+autologin-user=${USERNAME}
+autologin-session=qtile
+EOF
+        ;;
+        
+    18) # Sway (LightDM)
+        mkdir -p /etc/lightdm
+        cat > /etc/lightdm/lightdm.conf <<EOF
+[Seat:*]
+autologin-user=${USERNAME}
+autologin-session=sway
+EOF
+        ;;
+        
+    19) # Wayfire (LightDM)
+        mkdir -p /etc/lightdm
+        cat > /etc/lightdm/lightdm.conf <<EOF
+[Seat:*]
+autologin-user=${USERNAME}
+autologin-session=wayfire
+EOF
+        ;;
+        
     *)  # 다른 모든 DE - 자동 로그인 구성 없음
         # 기본 로그인 동작 사용
         ;;
