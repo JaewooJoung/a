@@ -203,23 +203,35 @@ echo "4) Awesome WM (for experts only)"
 echo "5) DWM (for experts only)"
 echo "6) Cinnamon (verified)"
 echo "7) Hyprland (for experts only)"
-read -p "Enter your choice (1-7): " de_choice
+echo "8) Bspwm (for experts only)"
+echo "9) Budgie (verified)"
+echo "10) Cosmic Epoch (verified)"
+echo "11) Cutefish (verified)"
+echo "12) Deepin (verified)"
+echo "13) Enlightenment (verified)"
+echo "14) i3-wm (for experts only)"
+echo "15) LXQt (verified)"
+echo "16) MATE (verified)"
+echo "17) Qtile (for experts only)"
+echo "18) Sway (for experts only)"
+echo "19) Wayfire (for experts only)"
+read -p "Enter your choice (1-19): " de_choice
 
 case $de_choice in
     1)  # KDE Plasma
-        DE_PACKAGES="plasma wayland plasma-desktop plasma-wayland-protocols kde-applications sddm"
+        DE_PACKAGES="plasma-meta konsole kate dolphin ark plasma-workspace sddm"
         DM_SERVICE="sddm"
         ;;
     2)  # GNOME
-        DE_PACKAGES="gnome gnome-extra gdm"
+        DE_PACKAGES="gnome gnome-tweaks gdm"
         DM_SERVICE="gdm"
         ;;
     3)  # XFCE
-        DE_PACKAGES="xfce4 xfce4-goodies lightdm lightdm-gtk-greeter thunar lxsession rxvt-unicode"
+        DE_PACKAGES="xfce4 xfce4-goodies pavucontrol gvfs xarchiver lightdm lightdm-gtk-greeter"
         DM_SERVICE="lightdm"
         ;;
     4)  # Awesome WM
-        DE_PACKAGES="awesome lightdm lightdm-gtk-greeter thunar"
+        DE_PACKAGES="awesome alacritty xorg-xinit xorg-xrandr xterm feh slock terminus-font gnu-free-fonts ttf-liberation xsel lightdm lightdm-gtk-greeter"
         DM_SERVICE="lightdm"
         ;;
     5)  # DWM
@@ -227,18 +239,70 @@ case $de_choice in
         DM_SERVICE="none"
         ;;
     6)  # Cinnamon
-        DE_PACKAGES="cinnamon lightdm lightdm-gtk-greeter"
+        DE_PACKAGES="cinnamon system-config-printer gnome-keyring gnome-terminal blueman bluez-utils engrampa gnome-screenshot gvfs-smb xed xdg-user-dirs-gtk lightdm lightdm-gtk-greeter"
         DM_SERVICE="lightdm"
         ;;
     7)  # Hyprland
-        DE_PACKAGES="hyprcursor hyprutils aquamarine hypridle hyprlock hyprland pyprland hyprland-qtutils waybar swaybg swaylock swayidle wlogout mako grim slurp wl-clipboard thunar"
+        DE_PACKAGES="hyprland dunst kitty dolphin wofi xdg-desktop-portal-hyprland qt5-wayland qt6-wayland polkit-kde-agent grim slurp sddm"
         DM_SERVICE="sddm"
+        ;;
+    8)  # Bspwm
+        DE_PACKAGES="bspwm sxhkd dmenu xdo rxvt-unicode lightdm lightdm-gtk-greeter"
+        DM_SERVICE="lightdm"
+        ;;
+    9)  # Budgie
+        DE_PACKAGES="arc-gtk-theme budgie mate-terminal nemo papirus-icon-theme lightdm lightdm-gtk-greeter"
+        DM_SERVICE="lightdm"
+        ;;
+    10) # Cosmic Epoch
+        DE_PACKAGES="cosmic sddm"
+        DM_SERVICE="sddm"
+        ;;
+    11) # Cutefish
+        DE_PACKAGES="cutefish noto-fonts sddm"
+        DM_SERVICE="sddm"
+        ;;
+    12) # Deepin
+        DE_PACKAGES="deepin deepin-terminal deepin-editor lightdm lightdm-gtk-greeter"
+        DM_SERVICE="lightdm"
+        ;;
+    13) # Enlightenment
+        DE_PACKAGES="enlightenment terminology lightdm lightdm-gtk-greeter"
+        DM_SERVICE="lightdm"
+        ;;
+    14) # i3-wm
+        DE_PACKAGES="i3-wm i3lock i3status i3blocks xss-lock xterm lightdm lightdm-gtk-greeter dmenu"
+        DM_SERVICE="lightdm"
+        ;;
+    15) # LXQt
+        DE_PACKAGES="lxqt breeze-icons oxygen-icons xdg-utils ttf-freefont leafpad slock lightdm lightdm-gtk-greeter"
+        DM_SERVICE="lightdm"
+        ;;
+    16) # MATE
+        DE_PACKAGES="mate mate-extra lightdm lightdm-gtk-greeter"
+        DM_SERVICE="lightdm"
+        ;;
+    17) # Qtile
+        DE_PACKAGES="qtile alacritty lightdm lightdm-gtk-greeter"
+        DM_SERVICE="lightdm"
+        ;;
+    18) # Sway
+        DE_PACKAGES="sway swaybg swaylock swayidle waybar dmenu brightnessctl grim slurp pavucontrol foot xorg-xwayland lightdm lightdm-gtk-greeter"
+        DM_SERVICE="lightdm"
+        ;;
+    19) # Wayfire
+        DE_PACKAGES="wayfire lightdm lightdm-gtk-greeter"
+        DM_SERVICE="lightdm"
         ;;
     *)
         echo "Invalid choice. Exiting..."
         exit 1
         ;;
 esac
+
+# Display selected packages and DM
+echo "Selected Desktop Environment Packages: $DE_PACKAGES"
+echo "Selected Display Manager: $DM_SERVICE"
 
 # 파티션 포맷
 clear
@@ -260,13 +324,15 @@ clear
 echo "Installing base system..."
 pacstrap -K /mnt base linux linux-firmware base-devel ${CPU_UCODE} \
     networkmanager terminus-font vim efibootmgr \
-    pipewire pipewire-alsa pipewire-jack \
+    pipewire pipewire-alsa pipewire-pulse pipewire-jack wireplumber libpulse \
+    gst-plugin-pipewire alsa-utils \
     reflector dhcpcd bash-completion \
     sudo btrfs-progs htop pacman-contrib pkgfile less \
     git curl wget zsh openssh man-db \
     xorg xorg-server xorg-apps xorg-drivers xorg-xkill xorg-xinit xterm \
     mesa libx11 libxft libxinerama freetype2 noto-fonts-emoji usbutils xdg-user-dirs \
-    konsole bluez bluez-utils blueman --noconfirm
+    konsole bluez bluez-utils blueman \
+    nano vim openssh htop wget iwd wireless_tools wpa_supplicant smartmontools xdg-utils --noconfirm
     
 # fstab 생성
 clear
