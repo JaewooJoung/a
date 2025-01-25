@@ -484,12 +484,7 @@ EOF
         ;;
         
     6)  # Cinnamon (LightDM)
-        mkdir -p /etc/lightdm
-        cat > /etc/lightdm/lightdm.conf <<EOF
-[Seat:*]
-autologin-user=${USERNAME}
-autologin-session=cinnamon
-EOF
+        # 시나몬도 지원하지 않음 
         ;;
         
     7)  # Hyprland (SDDM)
