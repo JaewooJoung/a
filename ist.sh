@@ -521,13 +521,7 @@ EOF
         ;;
         
     10) # Cosmic Epoch (SDDM)
-        mkdir -p /etc/sddm.conf.d
-        cat > /etc/sddm.conf.d/autologin.conf <<EOF
-[Autologin]
-User=${USERNAME}
-Session=cosmic.desktop
-Relogin=false
-EOF
+
         ;;
         
     11) # Cutefish (SDDM)
