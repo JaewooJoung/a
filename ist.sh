@@ -284,7 +284,7 @@ case $de_choice in
         ;;
     3)  # XFCE
         DE_PACKAGES="xfce4 xfce4-goodies pavucontrol gvfs xarchiver lightdm lightdm-gtk-greeter"
-        DM_SERVICE="lightdm"
+        DM_SERVICE="sddm"
         ;;
     4)  # Awesome WM
         DE_PACKAGES="awesome alacritty xorg-xinit xorg-xrandr xterm feh slock terminus-font gnu-free-fonts ttf-liberation xsel lightdm lightdm-gtk-greeter"
