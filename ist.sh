@@ -468,8 +468,8 @@ EOF
         ;;
         
     3)  # XFCE (LightDM)
-        mkdir -p /etc/lightdm
-        cat > /etc/lightdm/lightdm.conf <<EOF
+        mkdir -p /etc/sddm.conf.d
+        cat > /etc/sddm.conf.d/autologin.conf <<EOF
 [Seat:*]
 autologin-user=${USERNAME}
 autologin-session=xfce
