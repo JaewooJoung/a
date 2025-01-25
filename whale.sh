@@ -25,6 +25,9 @@ sudo -u "$SUDO_USER" bash -c 'curl -fsSL https://install.julialang.org | sh'
 echo "Naver Whale을 설치하는 중..."
 sudo -u "$SUDO_USER" yay -S naver-whale-stable --noconfirm
 
+echo "한글 office 을 설치하는 중..."
+sudo -u "$SUDO_USER" yay -S hoffice --noconfirm
+
 # 설치 확인
 echo "설치 확인 중..."
 if command -v juliaup &> /dev/null; then
@@ -34,9 +37,15 @@ else
 fi
 
 if pacman -Qi naver-whale-stable &> /dev/null; then
-    echo "Naver Whale이 성공적으로 설치되었습니다."
+    echo "Naver Whale 이 성공적으로 설치되었습니다."
 else
     echo "Naver Whale 설치에 실패했습니다."
+fi
+
+if pacman -Qi hoffice &> /dev/null; then
+    echo "한글 office 가 성공적으로 설치되었습니다."
+else
+    echo "한글 office 설치에 실패했습니다."
 fi
 
 echo "설치가 완료되었습니다!"
