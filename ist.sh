@@ -566,12 +566,7 @@ EOF
         ;;
         
     16) # MATE (LightDM)
-        mkdir -p /etc/lightdm
-        cat > /etc/lightdm/lightdm.conf <<EOF
-[Seat:*]
-autologin-user=${USERNAME}
-autologin-session=mate
-EOF
+
         ;;
         
     17) # Qtile (LightDM)
