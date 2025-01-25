@@ -468,14 +468,8 @@ EOF
         ;;
         
     3)  # XFCE (LightDM)
-        mkdir -p /etc/lightdm
-        cat > /etc/lightdm/lightdm.conf <<EOF
-[Seat:*]
-autologin-user=${USERNAME}
-autologin-session=xfce
-EOF
+        # XFCE는 자동 로그인을 지원하지 않음
         ;;
-        
     4)  # Awesome WM (LightDM)
         mkdir -p /etc/lightdm
         cat > /etc/lightdm/lightdm.conf <<EOF
