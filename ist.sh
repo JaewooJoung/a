@@ -284,7 +284,7 @@ case $de_choice in
         ;;
     3)  # XFCE
         DE_PACKAGES="xfce4 xfce4-goodies pavucontrol gvfs xarchiver lightdm lightdm-gtk-greeter"
-        DM_SERVICE="sddm"
+        DM_SERVICE="lightdm"  # Correct display manager for XFCE
         ;;
     4)  # Awesome WM
         DE_PACKAGES="awesome alacritty xorg-xinit xorg-xrandr xterm feh slock terminus-font gnu-free-fonts ttf-liberation xsel lightdm lightdm-gtk-greeter"
@@ -468,8 +468,8 @@ EOF
         ;;
         
     3)  # XFCE (LightDM)
-        mkdir -p /etc/sddm.conf.d
-        cat > /etc/sddm.conf.d/autologin.conf <<EOF
+        mkdir -p /etc/lightdm
+        cat > /etc/lightdm/lightdm.conf <<EOF
 [Seat:*]
 autologin-user=${USERNAME}
 autologin-session=xfce
