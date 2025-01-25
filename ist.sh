@@ -295,7 +295,7 @@ case $de_choice in
         DM_SERVICE="none"
         ;;
     6)  # Cinnamon
-        DE_PACKAGES="cinnamon gvfs-smb xed xdg-user-dirs-gtk lightdm lightdm-gtk-greeter"
+        DE_PACKAGES="cinnamon lightdm lightdm-gtk-greeter"
         DM_SERVICE="lightdm"
         ;;
     7)  # Hyprland
