@@ -10,21 +10,6 @@ fi
 echo "시스템을 업데이트하고 있습니다..."
 sudo pacman -Syu --noconfirm
 
-
-# Julia 설치 (juliaup을 통해)
-echo "Julia를 설치하는 중..."
-curl -fsSL https://install.julialang.org | sh
-
-# 설치 확인
-echo "설치 확인 중..."
-if command -v juliaup &> /dev/null; then
-    echo "Julia(juliaup)가 성공적으로 설치되었습니다."
-else
-    echo "Julia 설치에 실패했습니다."
-fi
-
-
-
 # 필요한 의존성 패키지들을 설치합니다
 echo "의존성 패키지들을 설치하고 있습니다..."
 sudo pacman -S --needed --noconfirm \
@@ -60,9 +45,24 @@ if ! command -v yay &> /dev/null; then
     echo "yay 설치가 완료되었습니다!"
 fi
 
+# Julia 설치 (juliaup을 통해)
+echo "Julia를 설치하는 중..."
+curl -fsSL https://install.julialang.org | sh
+
 # Naver Whale과 한글 오피스 설치
 echo "Naver Whale을 설치하는 중..."
 yay -S naver-whale-stable --noconfirm
+
+echo "한글 오피스를 설치하는 중..."
+yay -S hoffice --noconfirm
+
+# 설치 확인
+echo "설치 확인 중..."
+if command -v juliaup &> /dev/null; then
+    echo "Julia(juliaup)가 성공적으로 설치되었습니다."
+else
+    echo "Julia 설치에 실패했습니다."
+fi
 
 if yay -Qi naver-whale-stable &> /dev/null; then
     echo "Naver Whale이 성공적으로 설치되었습니다."
@@ -70,14 +70,19 @@ else
     echo "Naver Whale 설치에 실패했습니다."
 fi
 
-echo "한글 오피스를 설치하는 중..."
-yay -S hoffice --noconfirm
-
 if yay -Qi hoffice &> /dev/null; then
     echo "한글 오피스가 성공적으로 설치되었습니다."
 else
     echo "한글 오피스 설치에 실패했습니다."
 fi
+
+echo "설치가 완료되었습니다!"
+echo "Julia를 사용하기 위해 터미널을 재시작하거나 'source ~/.bashrc'를 실행해주세요칟"
+
+clear
+# 시스템 업데이트
+echo "시스템을 업데이트하고 있습니다..."
+sudo pacman -Syu --noconfirm
 
 # 필요한 의존성 패키지들을 설치합니다
 echo "의존성 패키지들을 설치하고 있습니다..."
@@ -100,6 +105,18 @@ if ! command -v rustc &> /dev/null; then
    echo "Rust를 설치하고 있습니다..."
    curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
    source "$HOME/.cargo/env"
+fi
+
+# yay가 설치되어 있지 않다면 설치합니다
+if ! command -v yay &> /dev/null; then
+   echo "yay를 설치하고 있습니다..."
+   cd /tmp
+   git clone https://aur.archlinux.org/yay.git
+   cd yay
+   makepkg -si --noconfirm
+   cd ..
+   rm -rf yay
+   echo "yay 설치가 완료되었습니다!"
 fi
 
 # 기존 kime 설치를 제거합니다
@@ -182,5 +199,5 @@ echo "kime를 시작합니다..."
 pkill kime || true  # 실행 중인 kime 프로세스가 있다면 종료합니다
 kime &
 
-echo "모든 설치가 완료되었습니다! 변경사항을 적용하려면 로그아웃 후 다시 로그인해주세요."
+echo "설치가 완료되었습니다! 변경사항을 적용하려면 로그아웃 후 다시 로그인해주세요."
 echo "오른쪽 Alt키나 한/영 키를 사용하여 한글/영문 입력을 전환할 수 있습니다."
