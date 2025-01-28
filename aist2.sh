@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# 명령어 실행 중 오류가 발생하면 즉시 스크립트를 종료합니다
+set -e
+
 # 색상 정의
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -20,6 +23,8 @@ sudo pacman -Syu --noconfirm
 echo -e "${BLUE}의존성 패키지들을 설치하고 있습니다...${NC}"
 sudo pacman -S --needed --noconfirm \
     noto-fonts-cjk \
+    adobe-source-han-sans-kr-fonts \
+    adobe-source-han-serif-kr-fonts \
     cairo \
     cmake \
     extra-cmake-modules \
@@ -42,7 +47,12 @@ sudo pacman -S --needed --noconfirm \
     libcurl-gnutls \
     openssl-1.1 \
     qt5-x11extras \
-    zlib
+    zlib \
+    xdg-utils \
+    libxkbcommon-x11 \
+    ibus \
+    qt5-tools \
+    ttf-d2coding
 
 # 폰트 설치
 echo -e "${BLUE}추가 한글 폰트를 설치합니다...${NC}"
@@ -96,12 +106,13 @@ if ! command -v yay &> /dev/null; then
     echo -e "${GREEN}yay 설치가 완료되었습니다!${NC}"
 fi
 
+
 # Julia 설치 (juliaup을 통해)
 clear
 echo -e "${BLUE}Julia를 설치하는 중...${NC}"
 curl -fsSL https://install.julialang.org | sh
 
-# Naver Whale설치
+# Naver Whale 설치
 clear
 echo -e "${BLUE}Naver Whale을 설치하는 중...${NC}"
 yay -S naver-whale-stable --noconfirm
@@ -116,16 +127,22 @@ clear
 echo -e "${BLUE}WPS 오피스를 설치하는 중...${NC}"
 yay -S wps-office-cn --noconfirm
 
+# 기존 kime 설치를 제거합니다
+echo -e "${BLUE}기존 kime 설치를 제거하고 있습니다...${NC}"
+sudo pacman -Rns kime kime-bin --noconfirm || true
+rm -rf ~/.config/kime || true
+
+# kime-bin을 설치합니다
+echo -e "${BLUE}kime-bin을 설치하고 있습니다...${NC}"
+yay -S --noconfirm kime-bin
+
 # Hancom Office 관련 디렉토리 설정
 HNCDIR="/opt/hnc"
 HNCCONTEXT="/opt/hnc/hoffice11/Bin/qt/plugins/platforminputcontexts"
 
-# kime 설치 및 설정
-echo -e "${BLUE}kime 설치 및 설정을 진행합니다...${NC}"
-yay -S kime-bin --noconfirm
-
 # kime 설정 파일 생성
 mkdir -p ~/.config/kime
+echo -e "${BLUE}kime 설정 파일을 생성합니다...${NC}"
 cat > ~/.config/kime/kime.yaml << 'EOL'
 log:
  version: 1
@@ -158,15 +175,48 @@ sudo install -Dm755 libkime-qt-5.11.3.so "${HNCCONTEXT}/libkime-qt-5.11.3.so"
 cd
 rm -rf "${TEMP_DIR}"
 
-# 환경 변수 설정
-echo -e "${BLUE}환경 변수를 설정합니다...${NC}"
-cat > ~/.xprofile << 'EOL'
+# X11용 설정을 합니다
+echo -e "${BLUE}X11용 kime 설정을 하고 있습니다...${NC}"
+touch ~/.xprofile
+grep -v "GTK_IM_MODULE\|QT_IM_MODULE\|XMODIFIERS\|OOO_FORCE_DESKTOP\|XDG_CURRENT_DESKTOP\|SAL_USE_VCLPLUGIN" ~/.xprofile > ~/.xprofile.tmp || true
+cat >> ~/.xprofile.tmp << 'EOL'
 export GTK_IM_MODULE=kime
 export QT_IM_MODULE=kime
 export XMODIFIERS=@im=kime
 export OOO_FORCE_DESKTOP=gnome
 export XDG_CURRENT_DESKTOP=gnome
 export SAL_USE_VCLPLUGIN=gtk3
+EOL
+mv ~/.xprofile.tmp ~/.xprofile
+
+# Wayland용 설정을 합니다
+echo -e "${BLUE}Wayland용 kime 설정을 하고 있습니다...${NC}"
+touch ~/.bash_profile
+grep -v "GTK_IM_MODULE\|QT_IM_MODULE\|XMODIFIERS\|OOO_FORCE_DESKTOP\|XDG_CURRENT_DESKTOP\|SAL_USE_VCLPLUGIN" ~/.bash_profile > ~/.bash_profile.tmp || true
+cat >> ~/.bash_profile.tmp << 'EOL'
+export GTK_IM_MODULE=kime
+export QT_IM_MODULE=kime
+export XMODIFIERS=@im=kime
+export OOO_FORCE_DESKTOP=gnome
+export XDG_CURRENT_DESKTOP=gnome
+export SAL_USE_VCLPLUGIN=gtk3
+EOL
+mv ~/.bash_profile.tmp ~/.bash_profile
+
+# 자동 시작에 kime를 추가합니다
+echo -e "${BLUE}kime를 자동 시작 목록에 추가하고 있습니다...${NC}"
+mkdir -p ~/.config/autostart
+cat > ~/.config/autostart/kime.desktop << 'EOL'
+[Desktop Entry]
+Type=Application
+Exec=kime
+Hidden=false
+NoDisplay=false
+X-GNOME-Autostart-enabled=true
+Name[en_US]=kime
+Name=kime
+Comment[en_US]=Korean Input Method Editor
+Comment=한글 입력기
 EOL
 
 # 설치 확인
@@ -204,3 +254,4 @@ echo -e "${GREEN}설치가 완료되었습니다!${NC}"
 echo -e "${GREEN}변경사항을 적용하려면 시스템을 재시작하거나 로그아웃 후 다시 로그인해주세요.${NC}"
 echo -e "${GREEN}Julia를 사용하기 위해 터미널을 재시작하거나 'source ~/.bashrc'를 실행해주세요.${NC}"
 echo -e "${GREEN}한글 오피스에서 한글 입력이 가능해야 합니다.${NC}"
+echo -e "${GREEN}오른쪽 Alt키나 한/영 키를 사용하여 한글/영문 입력을 전환할 수 있습니다.${NC}"
