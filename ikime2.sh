@@ -24,10 +24,132 @@ print_error() {
     echo -e "${RED}[오류]${NC} $1"
 }
 
-# kime 설치 및 설정 (이전 스크립트의 모든 내용 포함)
-[Previous kime installation script content...]
+# 시스템 업데이트
+print_status "시스템 업데이트를 진행합니다..."
+sudo pacman -Syu --noconfirm
 
-# 폰트 설치 부분
+# 의존성 패키지 설치
+print_status "필요한 패키지들을 설치합니다..."
+sudo pacman -S --needed --noconfirm \
+    noto-fonts-cjk \
+    cairo \
+    cmake \
+    extra-cmake-modules \
+    pkg-config \
+    dbus \
+    gtk3 \
+    gtk4 \
+    libxcb \
+    qt5-base \
+    qt6-base \
+    base-devel
+
+# Rust 설치 확인 및 설치
+if ! command -v rustc &> /dev/null; then
+    print_status "Rust를 설치합니다..."
+    curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+    source "$HOME/.cargo/env"
+    print_success "Rust 설치가 완료되었습니다."
+fi
+
+# yay 설치 확인 및 설치
+if ! command -v yay &> /dev/null; then
+    print_status "yay를 설치합니다..."
+    cd /tmp
+    git clone https://aur.archlinux.org/yay.git
+    cd yay
+    makepkg -si --noconfirm
+    cd ..
+    rm -rf yay
+    print_success "yay 설치가 완료되었습니다."
+fi
+
+# 기존 kime 제거
+print_status "기존 kime 설치를 제거합니다..."
+sudo pacman -Rns kime kime-bin --noconfirm 2>/dev/null || true
+rm -rf ~/.config/kime 2>/dev/null || true
+
+# kime-bin 설치
+print_status "kime-bin을 설치합니다..."
+yay -S --noconfirm kime-bin
+
+# kime 설정
+print_status "kime 설정을 시작합니다..."
+mkdir -p ~/.config/kime
+
+# kime.yaml 설정 파일 생성
+print_status "kime 설정 파일을 생성합니다..."
+cat > ~/.config/kime/kime.yaml << 'EOL'
+log:
+  version: 1
+indicator:
+  icon_color: "White"
+engine:
+  hangul_keys: ["Hangul", "Alt_R"]
+  compose_keys: ["Shift-Space"]
+  toggle_keys: ["Hangul", "Alt_R"]
+  xim_preedit_font: [D2Coding, 15.0]
+  latin_mode_on_press_shift: false
+  latin_mode_on_press_caps: false
+  global_category_mode: true
+  global_hotkeys: []
+  word_commit: false
+  commit_key1: "Shift"
+  commit_key2: "Shift"
+EOL
+
+# 환경 변수 및 LibreOffice 설정
+print_status "환경 변수 설정을 진행합니다..."
+
+# XDG_CURRENT_DESKTOP 설정 추가
+mkdir -p ~/.config/environment.d
+cat > ~/.config/environment.d/99-libreoffice-ime.conf << 'EOL'
+GTK_IM_MODULE=kime
+QT_IM_MODULE=kime
+XMODIFIERS=@im=kime
+OOO_FORCE_DESKTOP=gnome
+XDG_CURRENT_DESKTOP=gnome
+EOL
+
+# X11 설정
+print_status "X11 환경 설정을 진행합니다..."
+cat > ~/.xprofile << 'EOL'
+export GTK_IM_MODULE=kime
+export QT_IM_MODULE=kime
+export XMODIFIERS=@im=kime
+export OOO_FORCE_DESKTOP=gnome
+export XDG_CURRENT_DESKTOP=gnome
+export SAL_USE_VCLPLUGIN=gtk3
+EOL
+
+# Wayland 설정
+print_status "Wayland 환경 설정을 진행합니다..."
+cat > ~/.bash_profile << 'EOL'
+export GTK_IM_MODULE=kime
+export QT_IM_MODULE=kime
+export XMODIFIERS=@im=kime
+export OOO_FORCE_DESKTOP=gnome
+export XDG_CURRENT_DESKTOP=gnome
+export SAL_USE_VCLPLUGIN=gtk3
+EOL
+
+# 자동 시작 설정
+print_status "자동 시작 설정을 추가합니다..."
+mkdir -p ~/.config/autostart
+cat > ~/.config/autostart/kime.desktop << 'EOL'
+[Desktop Entry]
+Type=Application
+Exec=kime
+Hidden=false
+NoDisplay=false
+X-GNOME-Autostart-enabled=true
+Name[en_US]=kime
+Name=kime
+Comment[en_US]=Korean Input Method Editor
+Comment=한글 입력기
+EOL
+
+# 폰트 설치
 print_status "추가 한글 폰트를 설치합니다..."
 
 # 임시 디렉토리 생성
@@ -42,7 +164,7 @@ curl -L "https://github.com/JaewooJoung/a/raw/main/1737776534_fonts.tar.gz" -o f
 print_status "폰트 파일의 압축을 해제합니다..."
 tar xzf fonts.tar.gz
 
-# 시스템 폰트 디렉토리 생성 (없는 경우)
+# 시스템 폰트 디렉토리 생성
 sudo mkdir -p /usr/share/fonts/korean-custom
 
 # 폰트 파일 복사
@@ -60,37 +182,13 @@ sudo fc-cache -f -v
 cd
 rm -rf "$TEMP_DIR"
 
-print_success "폰트 설치가 완료되었습니다!"
-
-# LibreOffice 한글 입력 설정
-print_status "LibreOffice 한글 입력 설정을 적용합니다..."
-
-# 환경 변수 설정
-cat > ~/.config/environment.d/99-libreoffice-ime.conf << 'EOL'
-GTK_IM_MODULE=kime
-QT_IM_MODULE=kime
-XMODIFIERS=@im=kime
-OOO_FORCE_DESKTOP=gnome
-XDG_CURRENT_DESKTOP=gnome
-EOL
-
-# .xprofile 업데이트
-cat > ~/.xprofile << 'EOL'
-export GTK_IM_MODULE=kime
-export QT_IM_MODULE=kime
-export XMODIFIERS=@im=kime
-export OOO_FORCE_DESKTOP=gnome
-export XDG_CURRENT_DESKTOP=gnome
-export SAL_USE_VCLPLUGIN=gtk3
-EOL
-
 # LibreOffice 프로필 초기화
 print_status "LibreOffice 프로필을 초기화합니다..."
 rm -rf ~/.config/libreoffice || true
 
 # kime 재시작
 print_status "kime를 재시작합니다..."
-pkill kime || true
+pkill kime 2>/dev/null || true
 kime &
 
 print_success "모든 설치가 완료되었습니다!"
