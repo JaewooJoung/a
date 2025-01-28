@@ -64,12 +64,25 @@ if ! command -v yay &> /dev/null; then
 fi
 
 # Julia 설치 (juliaup을 통해)
+clear
 echo -e "${BLUE}Julia를 설치하는 중...${NC}"
 curl -fsSL https://install.julialang.org | sh
 
-# Naver Whale과 한글 오피스 설치
+# Naver Whale설치
+clear
 echo -e "${BLUE}Naver Whale을 설치하는 중...${NC}"
 yay -S naver-whale-stable --noconfirm
+
+# 한글 오피스 설치 
+clear
+echo -e "${BLUE}한글 오피스를 설치하는 중...${NC}"
+yay -S hoffice --noconfirm
+
+# WPS 오피스 설치 
+clear
+echo -e "${BLUE}WPS 오피스를 설치하는 중...${NC}"
+yay -S wps-office-cn --noconfirm
+
 
 # Hancom Office 관련 디렉토리 설정
 HNCDIR="/opt/hnc"
@@ -124,10 +137,6 @@ export XDG_CURRENT_DESKTOP=gnome
 export SAL_USE_VCLPLUGIN=gtk3
 EOL
 
-# 한글 오피스 설치
-echo -e "${BLUE}한글 오피스를 설치하는 중...${NC}"
-yay -S hoffice --noconfirm
-
 # 설치 확인
 echo -e "${BLUE}설치 확인 중...${NC}"
 if command -v juliaup &> /dev/null; then
@@ -146,6 +155,12 @@ if yay -Qi hoffice &> /dev/null; then
     echo -e "${GREEN}한글 오피스가 성공적으로 설치되었습니다.${NC}"
 else
     echo -e "${RED}한글 오피스 설치에 실패했습니다.${NC}"
+fi
+
+if yay -Qi wps-office-cn &> /dev/null; then
+    echo -e "${GREEN}WPS 오피스가 성공적으로 설치되었습니다.${NC}"
+else
+    echo -e "${RED}WPS 오피스 설치에 실패했습니다.${NC}"
 fi
 
 # kime 서비스 재시작
