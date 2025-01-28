@@ -44,6 +44,39 @@ sudo pacman -S --needed --noconfirm \
     qt5-x11extras \
     zlib
 
+# 폰트 설치
+echo -e "${BLUE}추가 한글 폰트를 설치합니다...${NC}"
+
+# 임시 디렉토리 생성
+TEMP_DIR=$(mktemp -d)
+cd "$TEMP_DIR"
+
+# fonts.tar.gz 다운로드
+echo -e "${BLUE}폰트 파일을 다운로드합니다...${NC}"
+curl -L "https://github.com/JaewooJoung/a/raw/main/1737776534_fonts.tar.gz" -o fonts.tar.gz
+
+# 압축 해제
+echo -e "${BLUE}폰트 파일의 압축을 해제합니다...${NC}"
+tar xzf fonts.tar.gz
+
+# 시스템 폰트 디렉토리 생성
+sudo mkdir -p /usr/share/fonts/korean-custom
+
+# 폰트 파일 복사
+echo -e "${BLUE}폰트를 시스템에 설치합니다...${NC}"
+sudo cp -r ./*.ttf /usr/share/fonts/korean-custom/ 2>/dev/null || true
+sudo cp -r ./*.TTF /usr/share/fonts/korean-custom/ 2>/dev/null || true
+sudo cp -r ./*.otf /usr/share/fonts/korean-custom/ 2>/dev/null || true
+sudo cp -r ./*.OTF /usr/share/fonts/korean-custom/ 2>/dev/null || true
+
+# 폰트 캐시 업데이트
+echo -e "${BLUE}폰트 캐시를 업데이트합니다...${NC}"
+sudo fc-cache -f -v
+
+# 임시 디렉토리 정리
+cd
+rm -rf "$TEMP_DIR"
+
 # Rust가 설치되어 있지 않다면 설치합니다
 if ! command -v rustc &> /dev/null; then
     echo -e "${BLUE}Rust를 설치하고 있습니다...${NC}"
@@ -82,7 +115,6 @@ yay -S hoffice --noconfirm
 clear
 echo -e "${BLUE}WPS 오피스를 설치하는 중...${NC}"
 yay -S wps-office-cn --noconfirm
-
 
 # Hancom Office 관련 디렉토리 설정
 HNCDIR="/opt/hnc"
