@@ -1,12 +1,11 @@
 #!/bin/bash
-
-# Install Nimf on Arch Linux - Automated Script
-
-# Step 1: Install Dependencies
+# 단계 0: 기존 입력기 제거
+echo "Uninstalling existing input methods..."
+sudo pacman -Rns --noconfirm ibus fcitx libhangul nimf
+# 단계 1: 의존성 패키지 설치
 echo "Installing dependencies..."
 sudo pacman -S --needed --noconfirm base-devel git intltool gtk2 gtk3 qt5-base anthy librime m17n-lib libappindicator-gtk3 libxkbcommon wayland libxklavier
-
-# Step 2: Build and Install libhangul
+# 단계 2: libhangul 빌드 및 설치
 echo "Building and installing libhangul..."
 if ! pkg-config --exists libhangul; then
     echo "libhangul not found. Building from source..."
@@ -21,13 +20,11 @@ if ! pkg-config --exists libhangul; then
 else
     echo "libhangul is already installed."
 fi
-
-# Step 3: Clone the Nimf Repository
+# 단계 3: Nimf 저장소 클론
 echo "Cloning Nimf repository..."
 git clone --recurse-submodules https://github.com/hamonikr/nimf.git
 cd nimf || { echo "Failed to enter nimf directory. Exiting..."; exit 1; }
-
-# Step 4: Build and Install Nimf
+# 단계 4: Nimf 빌드 및 설치
 echo "Building and installing Nimf..."
 ./autogen.sh || { echo "autogen.sh failed. Exiting..."; exit 1; }
 make || { echo "make failed. Exiting..."; exit 1; }
@@ -35,8 +32,7 @@ sudo make install || { echo "make install failed. Exiting..."; exit 1; }
 sudo make update-gtk-im-cache || { echo "update-gtk-im-cache failed. Exiting..."; exit 1; }
 sudo make update-gtk-icon-cache || { echo "update-gtk-icon-cache failed. Exiting..."; exit 1; }
 sudo ldconfig || { echo "ldconfig failed. Exiting..."; exit 1; }
-
-# Step 5: Configure Nimf
+# 단계 5: Nimf 설정
 echo "Configuring Nimf..."
 if command -v im-config &> /dev/null; then
     echo "Setting Nimf as the default input method using im-config..."
@@ -44,23 +40,19 @@ if command -v im-config &> /dev/null; then
 else
     echo "im-config not found. Please manually configure Nimf."
 fi
-
-# Step 6: Set Environment Variables
+# 단계 6: 환경 변수 설정
 echo "Setting environment variables..."
 {
     echo 'export GTK_IM_MODULE="nimf"'
     echo 'export QT_IM_MODULE="nimf"'
     echo 'export XMODIFIERS="@im=nimf"'
 } >> ~/.bashrc
-
-# Reload shell configuration
+# 쉘 설정 리로드
 source ~/.bashrc
-
-# Step 7: Start Nimf
+# 단계 7: Nimf 시작
 echo "Starting Nimf..."
 nimf &
-
-# Step 8: Final Message
+# 단계 8: 설치 완료 메시지
 echo "Nimf installation and configuration complete!"
 echo "You may need to restart your session or applications for changes to take effect."
 echo "To debug Nimf, run: nimf --debug"
