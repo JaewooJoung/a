@@ -200,7 +200,7 @@ yay -S hoffice ttf-d2coding --noconfirm
 # sublime visual-studio-code-bin 오피스 설치 
 clear
 echo -e "${BLUE}내가 잘쓰는 여러가지 설치하는 중...${NC}"
-yay -S sublime-text-4 visual-studio-code-bin teams teams-for-linux realvnc-vnc-server virtualbox-bin virtualbox-bin-guest-iso p3x-onenote-bin p3x-onenote unciv-bin snes9x-git --noconfirm
+yay -S sublime-text-4 visual-studio-code-bin teams teams-for-linux realvnc-vnc-server virtualbox-bin virtualbox-bin-guest-iso p3x-onenote-bin unciv-bin snes9x-git --noconfirm
 
 # 기존 kime 설치를 제거합니다
 echo -e "${BLUE}기존 kime 설치를 제거하고 있습니다...${NC}"
