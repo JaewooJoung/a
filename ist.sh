@@ -33,10 +33,10 @@ read -p "Enter your choice (1 or 2): " cpu_choice
 
 case $cpu_choice in
     1)
-        CPU_UCODE="intel-ucode xf86-video-intel"
+        CPU_UCODE="intel-ucode"
         ;;
     2)
-        CPU_UCODE="amd-ucode xf86-video-amdgpu"
+        CPU_UCODE="amd-ucode"
         ;;
     *)
         echo "Invalid choice. Exiting..."
