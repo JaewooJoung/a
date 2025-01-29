@@ -497,8 +497,8 @@ pacman -Sy --noconfirm
 
 # 프로그래밍 언어 및 개발 도구 설치
 pacman -S --noconfirm \
-    gimp libreoffice-fresh firefox thunderbird flatpak opentofu chromium code \
-    describeimage fortunecraft llm-manager ollama ollama-docs ghostty \
+    gimp libreoffice-fresh firefox thunderbird flatpak opentofu chromium transmission-gtk \
+    describeimage fortunecraft llm-manager ollama ollama-docs ghostty fastfetch \
     7zip blas64-openblas fftw libblastrampoline libgit2 libunwind libutf8proc lld llvm-julia-libs mbedtls2 openlibm pcre2 suitesparse \
     gnuplot cmake gcc-fortran libwhich llvm-julia patchelf python git base-devel cmake pkg-config perl
 
