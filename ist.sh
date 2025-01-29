@@ -275,7 +275,7 @@ read -p "Enter your choice (1-19): " de_choice
 
 case $de_choice in
     1)  # KDE Plasma
-        DE_PACKAGES="plasma-meta konsole kate dolphin ark plasma-workspace wayland plasma-desktop plasma-wayland-protocols kde-applications sddm"
+        DE_PACKAGES="plasma-meta konsole kate dolphin ark plasma-workspace wayland plasma-desktop plasma-wayland-protocols kde-applications bluedevil sddm"
         DM_SERVICE="sddm"
         ;;
     2)  # GNOME
