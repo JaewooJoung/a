@@ -44,69 +44,6 @@ case $cpu_choice in
         ;;
 esac
 
-# GPU 유형 선택 표시
-# GPU detection function with multiple card handling
-detect_gpu() {
-    local gpu_info=$(lspci | grep -i 'vga\|3d\|display')
-    local gpu_types=()
-    
-    # Check for multiple GPUs
-    if echo "$gpu_info" | grep -qi "nvidia"; then
-        gpu_types+=("nvidia")
-    fi
-    if echo "$gpu_info" | grep -qi "intel"; then
-        gpu_types+=("intel")
-    fi
-    if echo "$gpu_info" | grep -qi "amd\|ati"; then
-        gpu_types+=("amd")
-    fi
-    
-    # If no GPU detected, return basic
-    if [ ${#gpu_types[@]} -eq 0 ]; then
-        echo "1"  # Basic/Unknown
-        return
-    fi
-    
-    # Priority: NVIDIA > AMD > Intel > Basic
-    if [[ " ${gpu_types[@]} " =~ " nvidia " ]]; then
-        echo "4"  # NVIDIA
-    elif [[ " ${gpu_types[@]} " =~ " amd " ]]; then
-        echo "3"  # AMD
-    elif [[ " ${gpu_types[@]} " =~ " intel " ]]; then
-        echo "2"  # Intel
-    else
-        echo "1"  # Basic/Unknown
-    fi
-}
-
-# Common GPU packages
-GPU_COMMON="mesa vulkan-icd-loader lib32-mesa libva libvdpau mesa-utils"
-
-# Detect GPU and set configuration
-GPU_CHOICE=$(detect_gpu)
-case $GPU_CHOICE in
-    1) 
-        GPU_FXE="xf86-video-vesa"
-        GPU_TYPE="Basic Graphics"
-        GPU_CONFIG=""
-        ;;
-    2)
-        GPU_FXE="xf86-video-intel vulkan-intel intel-media-driver libva-intel-driver intel-gpu-tools"
-        GPU_TYPE="Intel Graphics"
-        GPU_CONFIG="options i915 enable_fbc=1 enable_psr=2 fastboot=1"
-        ;;
-    3)
-        GPU_FXE="xf86-video-amdgpu vulkan-radeon libva-mesa-driver mesa-vdpau"
-        GPU_TYPE="AMD Graphics"
-        GPU_CONFIG="options amdgpu si_support=1 cik_support=1"
-        ;;
-    4)
-        GPU_FXE="nvidia-dkms nvidia-utils lib32-nvidia-utils nvidia-settings"
-        GPU_TYPE="NVIDIA Graphics"
-        GPU_CONFIG="options nvidia-drm modeset=1"
-        ;;
-esac
-
 # 사용자 정보 확인
 # 사용자 이름 받기
 while true; do
@@ -224,7 +161,7 @@ echo "Choose your timezone by number:"
 echo "1) Stockholm"
 echo "2) Seoul"
 echo "3) Shanghai"
-echo "4) New York"
+echo "4) Madrid"
 echo
 
 while true; do
@@ -233,17 +170,17 @@ while true; do
         1) timezone="/usr/share/zoneinfo/Europe/Stockholm"; break;;
         2) timezone="/usr/share/zoneinfo/Asia/Seoul"; break;;
         3) timezone="/usr/share/zoneinfo/Asia/Shanghai"; break;;
-        4) timezone="/usr/share/zoneinfo/America/New_York"; break;;
+        4) timezone="/usr/share/zoneinfo/Europe/Madrid"; break;;
         *) echo "Please enter a number between 1 and 4";;
     esac
 done
 
 echo
 echo "Choose your language by number:"
-echo "1) Korean"
-echo "2) Swedish"
-echo "3) Chinese"
-echo "4) English US"
+echo "1) Korean_KR"
+echo "2) Swedish_SE"
+echo "3) Chinese_CN"
+echo "4) Spanish_ES"
 echo
 
 while true; do
@@ -262,8 +199,8 @@ while true; do
             lang_packages="adobe-source-han-sans-cn-fonts adobe-source-han-serif-cn-fonts ttf-liberation libreoffice-fresh-zh-cn gimp-help-zh_cn firefox-i18n-zh-cn thunderbird-i18n-zh-cn"
             break;;
         4) 
-            locale="en_US.UTF-8"
-            lang_packages="ttf-liberation"
+            locale="es_ES.UTF-8"
+            lang_packages="hunspell-es_es ttf-liberation noto-fonts firefox-i18n-es-ES thunderbird-i18n-es-ES libreoffice-fresh-es gimp-help-es"
             break;;
         *) echo "Please enter a number between 1 and 4";;
     esac
@@ -280,7 +217,6 @@ echo "Root: ${ROOT_PART}"
 echo "Username: ${USERNAME}"
 echo "Hostname: ${HOSTNAME}"
 echo "CPU Type: ${CPU_UCODE}"
-echo "GPU Type: ${GPU_TYPE}"
 echo "Timezone: ${timezone#/usr/share/zoneinfo/}"
 echo "Language: ${locale}"
 echo "==========================="
@@ -443,7 +379,7 @@ clear
 # 기본 시스템 설치
 echo "Installing base system..."
 pacstrap -K /mnt base linux linux-firmware base-devel ${CPU_UCODE} \
-    networkmanager terminus-font vim efibootmgr ${GPU_FXE} ${GPU_COMMON} \
+    networkmanager terminus-font vim efibootmgr \
     pipewire pipewire-alsa pipewire-pulse pipewire-jack wireplumber libpulse \
     gst-plugin-pipewire alsa-utils \
     reflector dhcpcd bash-completion \
@@ -453,7 +389,7 @@ pacstrap -K /mnt base linux linux-firmware base-devel ${CPU_UCODE} \
     libx11 libxft libxinerama freetype2 noto-fonts-emoji usbutils xdg-user-dirs \
     konsole bluez bluez-utils blueman \
     nano vim openssh htop wget iwd wireless_tools wpa_supplicant smartmontools xdg-utils --noconfirm
-
+    
 # fstab 생성
 clear
 echo "Generating fstab..."
@@ -536,25 +472,9 @@ EOF
         ;;
 esac
 
-# GPU 설정 (GPU Configuration)
-if [ -n "$GPU_CONFIG" ]; then
-    case $GPU_TYPE in
-        "Intel Graphics")
-            echo "$GPU_CONFIG" > /etc/modprobe.d/i915.conf
-            ;;
-        "AMD Graphics")
-            echo "$GPU_CONFIG" > /etc/modprobe.d/amdgpu.conf
-            ;;
-        "NVIDIA Graphics")
-            echo "$GPU_CONFIG" > /etc/modprobe.d/nvidia.conf
-            sed -i 's/^MODULES=(.*)/MODULES=(nvidia nvidia_modeset nvidia_uvm nvidia_drm)/' /etc/mkinitcpio.conf
-            mkinitcpio -P  # Regenerate initramfs after modifying mkinitcpio.conf
-            ;;
-    esac
-fi
-
-# 부트로더 설치 및 구성 (Bootloader installation and configuration)
+# 부트로더 설치 및 구성
 bootctl install
+
 mkdir -p /boot/loader/entries
 cat > /boot/loader/loader.conf <<EOF
 default arch.conf
@@ -578,7 +498,7 @@ pacman -Sy --noconfirm
 # 프로그래밍 언어 및 개발 도구 설치
 pacman -S --noconfirm \
     gimp libreoffice-fresh firefox thunderbird flatpak opentofu chromium transmission-gtk \
-    describeimage fortunecraft llm-manager ollama ollama-docs ghostty fastfetch vlc \
+    describeimage fortunecraft llm-manager ollama ollama-docs ghostty fastfetch \
     7zip blas64-openblas fftw libblastrampoline libgit2 libunwind libutf8proc lld llvm-julia-libs mbedtls2 openlibm pcre2 suitesparse \
     gnuplot cmake gcc-fortran libwhich llvm-julia patchelf python git base-devel cmake pkg-config perl
 
