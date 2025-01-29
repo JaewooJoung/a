@@ -51,8 +51,7 @@ sudo pacman -S --needed --noconfirm \
     xdg-utils \
     libxkbcommon-x11 \
     ibus \
-    qt5-tools \
-    ttf-d2coding
+    qt5-tools 
 
 # 폰트 설치
 echo -e "${BLUE}추가 한글 폰트를 설치합니다...${NC}"
@@ -120,12 +119,12 @@ yay -S naver-whale-stable --noconfirm
 # 한글 오피스 설치 
 clear
 echo -e "${BLUE}한글 오피스를 설치하는 중...${NC}"
-yay -S hoffice --noconfirm
+yay -S hoffice ttf-d2coding --noconfirm
 
 # WPS 오피스 설치 
-clear
-echo -e "${BLUE}WPS 오피스를 설치하는 중...${NC}"
-yay -S wps-office-cn --noconfirm
+#clear
+#echo -e "${BLUE}WPS 오피스를 설치하는 중...${NC}"
+#yay -S wps-office-cn --noconfirm
 
 # 기존 kime 설치를 제거합니다
 echo -e "${BLUE}기존 kime 설치를 제거하고 있습니다...${NC}"
@@ -239,11 +238,11 @@ else
     echo -e "${RED}한글 오피스 설치에 실패했습니다.${NC}"
 fi
 
-if yay -Qi wps-office-cn &> /dev/null; then
-    echo -e "${GREEN}WPS 오피스가 성공적으로 설치되었습니다.${NC}"
-else
-    echo -e "${RED}WPS 오피스 설치에 실패했습니다.${NC}"
-fi
+#if yay -Qi wps-office-cn &> /dev/null; then
+#    echo -e "${GREEN}WPS 오피스가 성공적으로 설치되었습니다.${NC}"
+#else
+#    echo -e "${RED}WPS 오피스 설치에 실패했습니다.${NC}"
+#fi
 
 # kime 서비스 재시작
 echo -e "${BLUE}kime 서비스를 재시작합니다...${NC}"
