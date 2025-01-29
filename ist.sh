@@ -33,10 +33,10 @@ read -p "Enter your choice (1 or 2): " cpu_choice
 
 case $cpu_choice in
     1)
-        CPU_UCODE="intel-ucode"
+        CPU_UCODE="intel-ucode xf86-video-intel vulkan-intel intel-media-driver libva-intel-driver intel-gpu-tools mesa vulkan-icd-loader lib32-mesa libva libvdpau mesa-utils"
         ;;
     2)
-        CPU_UCODE="amd-ucode"
+        CPU_UCODE="amd-ucode xf86-video-amdgpu vulkan-radeon libva-mesa-driver mesa-vdpau mesa vulkan-icd-loader lib32-mesa libva libvdpau mesa-utils"
         ;;
     *)
         echo "Invalid choice. Exiting..."
@@ -386,7 +386,7 @@ pacstrap -K /mnt base linux linux-firmware base-devel ${CPU_UCODE} \
     sudo btrfs-progs htop pacman-contrib pkgfile less \
     git curl wget zsh openssh man-db \
     xorg xorg-server xorg-apps xorg-drivers xorg-xkill xorg-xinit xterm \
-    mesa libx11 libxft libxinerama freetype2 noto-fonts-emoji usbutils xdg-user-dirs \
+    libx11 libxft libxinerama freetype2 noto-fonts-emoji usbutils xdg-user-dirs \
     konsole bluez bluez-utils blueman \
     nano vim openssh htop wget iwd wireless_tools wpa_supplicant smartmontools xdg-utils --noconfirm
     
