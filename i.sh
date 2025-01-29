@@ -45,34 +45,65 @@ case $cpu_choice in
 esac
 
 # GPU 유형 선택 표시
-clear
-echo "Select your GPU type:"
-echo "1. Dude!! I do not know!"
-echo "2. Intel GPU (ARC...etc)"
-echo "3. AMD GPU (RADENON...etc)"
-echo "4. N-GPU"
-read -p "Enter your choice (1 or 2): " gpu_choice
+# GPU detection function with multiple card handling
+detect_gpu() {
+    local gpu_info=$(lspci | grep -i 'vga\|3d\|display')
+    local gpu_types=()
+    
+    # Check for multiple GPUs
+    if echo "$gpu_info" | grep -qi "nvidia"; then
+        gpu_types+=("nvidia")
+    fi
+    if echo "$gpu_info" | grep -qi "intel"; then
+        gpu_types+=("intel")
+    fi
+    if echo "$gpu_info" | grep -qi "amd\|ati"; then
+        gpu_types+=("amd")
+    fi
+    
+    # If no GPU detected, return basic
+    if [ ${#gpu_types[@]} -eq 0 ]; then
+        echo "1"  # Basic/Unknown
+        return
+    fi
+    
+    # Priority: NVIDIA > AMD > Intel > Basic
+    if [[ " ${gpu_types[@]} " =~ " nvidia " ]]; then
+        echo "4"  # NVIDIA
+    elif [[ " ${gpu_types[@]} " =~ " amd " ]]; then
+        echo "3"  # AMD
+    elif [[ " ${gpu_types[@]} " =~ " intel " ]]; then
+        echo "2"  # Intel
+    else
+        echo "1"  # Basic/Unknown
+    fi
+}
 
-case $gpu_choice in
-    1)
-        GPU_FXE="mesa vulkan-icd-loader lib32-mesa libva libvdpau mesa-utils"
-        GPU_TYPE="None"
+# Common GPU packages
+GPU_COMMON="mesa vulkan-icd-loader lib32-mesa libva libvdpau mesa-utils"
+
+# Detect GPU and set configuration
+GPU_CHOICE=$(detect_gpu)
+case $GPU_CHOICE in
+    1) 
+        GPU_FXE="xf86-video-vesa"
+        GPU_TYPE="Basic Graphics"
+        GPU_CONFIG=""
         ;;
     2)
-        GPU_FXE="xf86-video-intel vulkan-intel intel-media-driver libva-intel-driver intel-gpu-tools mesa vulkan-icd-loader lib32-mesa libva libvdpau mesa-utils"
+        GPU_FXE="xf86-video-intel vulkan-intel intel-media-driver libva-intel-driver intel-gpu-tools"
         GPU_TYPE="Intel Graphics"
+        GPU_CONFIG="options i915 enable_fbc=1 enable_psr=2 fastboot=1"
         ;;
     3)
-        GPU_FXE="xf86-video-amdgpu vulkan-radeon libva-mesa-driver mesa-vdpau mesa vulkan-icd-loader lib32-mesa libva libvdpau mesa-utils"
+        GPU_FXE="xf86-video-amdgpu vulkan-radeon libva-mesa-driver mesa-vdpau"
         GPU_TYPE="AMD Graphics"
+        GPU_CONFIG="options amdgpu si_support=1 cik_support=1"
         ;;
     4)
-        GPU_FXE="nvidia nvidia-utils lib32-nvidia-utils nvidia-settings vulkan-icd-loader lib32-vulkan-icd-loader mesa lib32-mesa libva libvdpau mesa-utils"
-        GPU_TYPE="N. Graphics"
-        ;;
-    *)
-        echo "Invalid choice. Exiting..."
-        exit 1
+        GPU_FXE="nvidia-dkms nvidia-utils lib32-nvidia-utils nvidia-settings"
+        GPU_TYPE="NVIDIA Graphics"
+        GPU_CONFIG="options nvidia-drm modeset=1"
         ;;
 esac
 
@@ -412,7 +443,7 @@ clear
 # 기본 시스템 설치
 echo "Installing base system..."
 pacstrap -K /mnt base linux linux-firmware base-devel ${CPU_UCODE} \
-    networkmanager terminus-font vim efibootmgr \
+    networkmanager terminus-font vim efibootmgr ${GPU_FXE} ${GPU_COMMON} \
     pipewire pipewire-alsa pipewire-pulse pipewire-jack wireplumber libpulse \
     gst-plugin-pipewire alsa-utils \
     reflector dhcpcd bash-completion \
@@ -422,7 +453,7 @@ pacstrap -K /mnt base linux linux-firmware base-devel ${CPU_UCODE} \
     libx11 libxft libxinerama freetype2 noto-fonts-emoji usbutils xdg-user-dirs \
     konsole bluez bluez-utils blueman \
     nano vim openssh htop wget iwd wireless_tools wpa_supplicant smartmontools xdg-utils --noconfirm
-    
+
 # fstab 생성
 clear
 echo "Generating fstab..."
@@ -505,9 +536,25 @@ EOF
         ;;
 esac
 
-# 부트로더 설치 및 구성
-bootctl install
+# GPU 설정 (GPU Configuration)
+if [ -n "$GPU_CONFIG" ]; then
+    case $GPU_TYPE in
+        "Intel Graphics")
+            echo "$GPU_CONFIG" > /etc/modprobe.d/i915.conf
+            ;;
+        "AMD Graphics")
+            echo "$GPU_CONFIG" > /etc/modprobe.d/amdgpu.conf
+            ;;
+        "NVIDIA Graphics")
+            echo "$GPU_CONFIG" > /etc/modprobe.d/nvidia.conf
+            sed -i 's/^MODULES=(.*)/MODULES=(nvidia nvidia_modeset nvidia_uvm nvidia_drm)/' /etc/mkinitcpio.conf
+            mkinitcpio -P  # Regenerate initramfs after modifying mkinitcpio.conf
+            ;;
+    esac
+fi
 
+# 부트로더 설치 및 구성 (Bootloader installation and configuration)
+bootctl install
 mkdir -p /boot/loader/entries
 cat > /boot/loader/loader.conf <<EOF
 default arch.conf
@@ -530,8 +577,8 @@ pacman -Sy --noconfirm
 
 # 프로그래밍 언어 및 개발 도구 설치
 pacman -S --noconfirm \
-    gimp libreoffice-fresh firefox thunderbird flatpak opentofu chromium transmission-gtk ${GPU_FXE} \
-    describeimage fortunecraft llm-manager ollama ollama-docs ghostty fastfetch \
+    gimp libreoffice-fresh firefox thunderbird flatpak opentofu chromium transmission-gtk \
+    describeimage fortunecraft llm-manager ollama ollama-docs ghostty fastfetch vlc \
     7zip blas64-openblas fftw libblastrampoline libgit2 libunwind libutf8proc lld llvm-julia-libs mbedtls2 openlibm pcre2 suitesparse \
     gnuplot cmake gcc-fortran libwhich llvm-julia patchelf python git base-devel cmake pkg-config perl
 
