@@ -33,10 +33,10 @@ read -p "Enter your choice (1 or 2): " cpu_choice
 
 case $cpu_choice in
     1)
-        CPU_UCODE="intel-ucode xf86-video-intel vulkan-intel intel-media-driver libva-intel-driver intel-gpu-tools"
+        CPU_UCODE="intel-ucode xf86-video-intel"
         ;;
     2)
-        CPU_UCODE="amd-ucode xf86-video-amdgpu vulkan-radeon libva-mesa-driver mesa-vdpau"
+        CPU_UCODE="amd-ucode xf86-video-amdgpu"
         ;;
     *)
         echo "Invalid choice. Exiting..."
