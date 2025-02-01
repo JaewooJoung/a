@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # 명령어 실행 중 오류가 발생하면 즉시 스크립트를 종료합니다
-set -e
+# set -e
 
 # 색상 정의
 RED='\033[0;31m'
@@ -100,35 +100,12 @@ sudo pacman -Syu --noconfirm
 # 필요한 의존성 패키지들을 설치합니다
 echo -e "${BLUE}의존성 패키지들을 설치하고 있습니다...${NC}"
 sudo pacman -S --needed --noconfirm \
-    noto-fonts-cjk \
-    adobe-source-han-sans-kr-fonts \
-    adobe-source-han-serif-kr-fonts \
-    cairo \
-    cmake \
-    extra-cmake-modules \
-    pkg-config \
-    dbus \
-    gtk3 \
-    gtk4 \
-    libxcb \
-    qt5-base \
-    qt6-base \
-    base-devel \
-    fontconfig \
-    freetype2 \
-    gcc-libs \
-    glibc \
-    glu \
-    harfbuzz \
-    harfbuzz-icu \
-    libcups \
-    libcurl-gnutls \
-    openssl-1.1 \
-    qt5-x11extras \
-    zlib \
-    xdg-utils \
-    libxkbcommon-x11 \
-    qt5-tools 
+    noto-fonts-cjk adobe-source-han-sans-kr-fonts adobe-source-han-serif-kr-fonts \
+    cairo cmake extra-cmake-modules pkg-config dbus gtk3 gtk4 libxcb qt5-base \
+    qt6-base base-devel fontconfig freetype2 gcc-libs glibc glu harfbuzz \
+    harfbuzz-icu libcups libcurl-gnutls openssl-1.1 qt5-x11extras zlib \
+    xdg-utils libxkbcommon-x11 qt5-tools transmission-remote-gtk \
+	ttf-jetbrains-mono ttf-jetbrains-mono-nerd nodejs npm
 
 # 폰트 설치
 echo -e "${BLUE}추가 한글 폰트를 설치합니다...${NC}"
@@ -200,7 +177,9 @@ yay -S hoffice ttf-d2coding --noconfirm
 # sublime visual-studio-code-bin 오피스 설치 
 clear
 echo -e "${BLUE}내가 잘쓰는 여러가지 설치하는 중...${NC}"
-yay -S sublime-text-4 visual-studio-code-bin teams teams-for-linux realvnc-vnc-server virtualbox-bin virtualbox-bin-guest-iso p3x-onenote-bin unciv-bin snes9x-git --noconfirm
+yay -S sublime-text-4 visual-studio-code-bin teams teams-for-linux realvnc-vnc-server virtualbox-bin virtualbox-bin-guest-iso p3x-onenote-bin unciv-bin snes9x-git freetube github-cli \
+        whatsapp-for-linux \
+        --noconfirm
 
 # 기존 kime 설치를 제거합니다
 echo -e "${BLUE}기존 kime 설치를 제거하고 있습니다...${NC}"
