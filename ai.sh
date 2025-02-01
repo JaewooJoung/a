@@ -106,7 +106,7 @@ sudo pacman -S --needed --noconfirm \
     harfbuzz-icu libcups libcurl-gnutls openssl-1.1 qt5-x11extras zlib \
     xdg-utils libxkbcommon-x11 qt5-tools transmission-remote-gtk \
     ttf-jetbrains-mono ttf-jetbrains-mono-nerd nodejs npm cronie \
-    nano conky
+    nano conky samba
 
 # 폰트 설치
 echo -e "${BLUE}추가 한글 폰트를 설치합니다...${NC}"
