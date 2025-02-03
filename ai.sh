@@ -106,7 +106,7 @@ sudo pacman -S --needed --noconfirm \
     harfbuzz-icu libcups libcurl-gnutls openssl-1.1 qt5-x11extras zlib \
     xdg-utils libxkbcommon-x11 qt5-tools transmission-remote-gtk \
     ttf-jetbrains-mono ttf-jetbrains-mono-nerd nodejs npm cronie \
-    obs-studio v4l2loopback-dkms ffmpeg obs-plugin-browser pipewire pipewire-pulse pipewire-alsa \
+    obs-studio v4l2loopback-dkms \
     nano conky samba net-tools 
 
 # 폰트 설치
