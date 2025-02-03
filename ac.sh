@@ -93,6 +93,48 @@ if [ -n "$GPU_CONFIG" ]; then
     esac
 fi
 
+
+# 如果未安装Rust，则安装
+if ! command -v rustc &> /dev/null; then
+    echo -e "${BLUE}正在安装Rust...${NC}"
+    curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+    source "$HOME/.cargo/env"
+fi
+
+# 如果未安装yay，则安装
+if ! command -v yay &> /dev/null; then
+    echo -e "${BLUE}正在安装yay...${NC}"
+    cd /tmp
+    git clone https://aur.archlinux.org/yay.git
+    cd yay
+    makepkg -si --noconfirm
+    cd ..
+    rm -rf yay
+    echo -e "${GREEN}yay安装完成！${NC}"
+fi
+
+# 安装Julia（通过juliaup）
+clear
+echo -e "${BLUE}正在安装Julia...${NC}"
+curl -fsSL https://install.julialang.org | sh
+
+# 安装Naver Whale
+clear
+echo -e "${BLUE}正在安装baidunetdisk ...${NC}"
+yay -S baidunetdisk-bin --noconfirm
+
+# 安装WPS Office（中文版）
+clear
+echo -e "${BLUE}正在安装WPS Office...${NC}"
+yay -S wps-office-cn ttf-d2coding --noconfirm
+
+# 安装sublime、visual-studio-code-bin等
+clear
+echo -e "${BLUE}正在安装常用软件...${NC}"
+yay -S sublime-text-4 visual-studio-code-bin teams teams-for-linux realvnc-vnc-server p3x-onenote-bin unciv-bin snes9x-git freetube github-cli \
+        whatsapp-for-linux \
+        --noconfirm
+
 # 系统更新
 echo -e "${BLUE}正在更新系统...${NC}"
 sudo pacman -Syu --noconfirm
@@ -162,46 +204,7 @@ sudo fc-cache -f -v
 cd
 rm -rf "$TEMP_DIR"
 
-# 如果未安装Rust，则安装
-if ! command -v rustc &> /dev/null; then
-    echo -e "${BLUE}正在安装Rust...${NC}"
-    curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
-    source "$HOME/.cargo/env"
-fi
 
-# 如果未安装yay，则安装
-if ! command -v yay &> /dev/null; then
-    echo -e "${BLUE}正在安装yay...${NC}"
-    cd /tmp
-    git clone https://aur.archlinux.org/yay.git
-    cd yay
-    makepkg -si --noconfirm
-    cd ..
-    rm -rf yay
-    echo -e "${GREEN}yay安装完成！${NC}"
-fi
-
-# 安装Julia（通过juliaup）
-clear
-echo -e "${BLUE}正在安装Julia...${NC}"
-curl -fsSL https://install.julialang.org | sh
-
-# 安装Naver Whale
-clear
-echo -e "${BLUE}正在安装Naver Whale...${NC}"
-yay -S naver-whale-stable --noconfirm
-
-# 安装WPS Office（中文版）
-clear
-echo -e "${BLUE}正在安装WPS Office...${NC}"
-yay -S wps-office-cn ttf-d2coding --noconfirm
-
-# 安装sublime、visual-studio-code-bin等
-clear
-echo -e "${BLUE}正在安装常用软件...${NC}"
-yay -S sublime-text-4 visual-studio-code-bin teams teams-for-linux realvnc-vnc-server p3x-onenote-bin unciv-bin snes9x-git freetube github-cli \
-        whatsapp-for-linux \
-        --noconfirm
 
 # Virtualbox初始设置
 sudo modprobe vboxdrv
