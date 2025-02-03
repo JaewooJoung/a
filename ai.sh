@@ -107,7 +107,7 @@ sudo pacman -S --needed --noconfirm \
     xdg-utils libxkbcommon-x11 qt5-tools transmission-remote-gtk \
     ttf-jetbrains-mono ttf-jetbrains-mono-nerd nodejs npm cronie \
     obs-studio v4l2loopback-dkms virtualbox virtualbox-host-modules-arch \
-    nano conky samba net-tools 
+    nano conky samba net-tools bluez bluez-utils bluedevil 
 
 # 폰트 설치
 echo -e "${BLUE}추가 한글 폰트를 설치합니다...${NC}"
@@ -305,6 +305,9 @@ fi
 echo -e "${BLUE}kime 서비스를 재시작합니다...${NC}"
 pkill kime 2>/dev/null || true
 kime &
+
+sudo modprobe vboxdrv
+sudo usermod -aG vboxusers $USER
 
 echo -e "${GREEN}설치가 완료되었습니다!${NC}"
 echo -e "${GREEN}변경사항을 적용하려면 시스템을 재시작하거나 로그아웃 후 다시 로그인해주세요.${NC}"
