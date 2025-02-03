@@ -191,9 +191,9 @@ clear
 echo -e "${BLUE}正在安装Naver Whale...${NC}"
 yay -S naver-whale-stable --noconfirm
 
-# 安装韩文Office 
+# 安装WPS Office（中文版）
 clear
-echo -e "${BLUE}正在安装韩文Office...${NC}"
+echo -e "${BLUE}正在安装WPS Office...${NC}"
 yay -S wps-office-cn ttf-d2coding --noconfirm
 
 # 安装sublime、visual-studio-code-bin等
