@@ -106,7 +106,7 @@ sudo pacman -S --needed --noconfirm \
     harfbuzz-icu libcups libcurl-gnutls openssl-1.1 qt5-x11extras zlib \
     xdg-utils libxkbcommon-x11 qt5-tools transmission-remote-gtk \
     ttf-jetbrains-mono ttf-jetbrains-mono-nerd nodejs npm cronie \
-    obs-studio v4l2loopback-dkms \
+    obs-studio v4l2loopback-dkms virtualbox virtualbox-host-modules-arch \
     nano conky samba net-tools 
 
 # 폰트 설치
@@ -179,7 +179,7 @@ yay -S hoffice ttf-d2coding --noconfirm
 # sublime visual-studio-code-bin 오피스 설치 
 clear
 echo -e "${BLUE}내가 잘쓰는 여러가지 설치하는 중...${NC}"
-yay -S sublime-text-4 visual-studio-code-bin teams teams-for-linux realvnc-vnc-server virtualbox-bin virtualbox-bin-guest-iso p3x-onenote-bin unciv-bin snes9x-git freetube github-cli \
+yay -S sublime-text-4 visual-studio-code-bin teams teams-for-linux realvnc-vnc-server p3x-onenote-bin unciv-bin snes9x-git freetube github-cli \
         whatsapp-for-linux \
         --noconfirm
 
