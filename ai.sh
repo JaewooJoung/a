@@ -306,8 +306,13 @@ echo -e "${BLUE}kime 서비스를 재시작합니다...${NC}"
 pkill kime 2>/dev/null || true
 kime &
 
+# Virtualbox 초기설정 
 sudo modprobe vboxdrv
 sudo usermod -aG vboxusers $USER
+
+#bluetooth 켜기
+sudo systemctl start bluetooth
+sudo systemctl enable bluetooth
 
 echo -e "${GREEN}설치가 완료되었습니다!${NC}"
 echo -e "${GREEN}변경사항을 적용하려면 시스템을 재시작하거나 로그아웃 후 다시 로그인해주세요.${NC}"
