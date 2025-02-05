@@ -153,58 +153,102 @@ sudo pacman -S --needed --noconfirm \
 
 # 安装fcitx及中文输入法
 echo -e "${BLUE}正在安装fcitx及中文输入法...${NC}"
-sudo pacman -S --noconfirm fcitx fcitx-configtool fcitx-googlepinyin fcitx-rime fcitx-gtk2 fcitx-gtk3 fcitx-qt5
+# Install fcitx and input methods (if not already installed)
+echo -e "${BLUE}Installing/checking fcitx and input methods...${NC}"
+sudo pacman -S --needed --noconfirm \
+    fcitx \
+    fcitx-im \
+    fcitx-configtool \
+    fcitx-googlepinyin \
+    fcitx-rime \
+    fcitx-gtk2 \
+    fcitx-gtk3 \
+    fcitx-qt5
 
-# 安装fcitx-baidupinyin（来自AUR）
-echo -e "${BLUE}正在安装fcitx-baidupinyin...${NC}"
-yay -S --noconfirm fcitx-baidupinyin
+# Check if fcitx-baidupinyin is installed
+if ! pacman -Qs fcitx-baidupinyin > /dev/null; then
+    echo -e "${BLUE}Installing fcitx-baidupinyin...${NC}"
+    yay -S --noconfirm fcitx-baidupinyin
+fi
 
-# 配置fcitx环境变量
-echo -e "${BLUE}正在配置fcitx环境变量...${NC}"
-cat >> ~/.xprofile << 'EOL'
-export GTK_IM_MODULE=fcitx
-export QT_IM_MODULE=fcitx
-export XMODIFIERS=@im=fcitx
+# Configure environment variables (append if not exists)
+echo -e "${BLUE}Configuring environment variables...${NC}"
+
+# Function to add environment variables if they don't exist
+add_env_vars() {
+    local file=$1
+    local vars=(
+        "export GTK_IM_MODULE=fcitx"
+        "export QT_IM_MODULE=fcitx"
+        "export XMODIFIERS=@im=fcitx"
+    )
+    
+    for var in "${vars[@]}"; do
+        if ! grep -q "^$var" "$file" 2>/dev/null; then
+            echo "$var" >> "$file"
+        fi
+    done
+}
+
+# Add to various config files
+add_env_vars ~/.xprofile
+add_env_vars ~/.bashrc
+[ -f ~/.xinitrc ] && add_env_vars ~/.xinitrc
+
+# Add fcitx autostart if not exists
+if ! grep -q "fcitx -d" ~/.xprofile; then
+    echo "fcitx -d" >> ~/.xprofile
+fi
+
+# Create xorg config for fcitx if not exists
+if [ ! -f /etc/X11/xorg.conf.d/30-fcitx.conf ]; then
+    echo -e "${BLUE}Creating Xorg configuration for fcitx...${NC}"
+    sudo mkdir -p /etc/X11/xorg.conf.d
+    sudo tee /etc/X11/xorg.conf.d/30-fcitx.conf > /dev/null << 'EOL'
+Section "InputClass"
+    Identifier "Fcitx"
+    MatchIsKeyboard "on"
+    Option "DefaultServerLayout" "fcitx"
+EndSection
 EOL
+fi
 
-# 启动fcitx
-echo -e "${BLUE}正在启动fcitx...${NC}"
-fcitx-autostart &>/dev/null
+# Create autostart entry if not exists
+mkdir -p ~/.config/autostart
+if [ ! -f ~/.config/autostart/fcitx.desktop ]; then
+    cat > ~/.config/autostart/fcitx.desktop << 'EOL'
+[Desktop Entry]
+Name=Fcitx
+Comment=Start Input Method
+Exec=fcitx
+Icon=fcitx
+Terminal=false
+Type=Application
+Categories=System;
+X-GNOME-Autostart-Phase=Applications
+X-GNOME-AutoRestart=false
+X-GNOME-Autostart-Notify=false
+X-KDE-autostart-after=panel
+EOL
+fi
 
-# 安装字体
-echo -e "${BLUE}正在安装额外的中文字体...${NC}"
+# Restart fcitx
+echo -e "${BLUE}Restarting fcitx...${NC}"
+killall fcitx 2>/dev/null
+fcitx -d
 
-# 创建临时目录
-TEMP_DIR=$(mktemp -d)
-cd "$TEMP_DIR"
+# Set up default configuration if not exists
+mkdir -p ~/.config/fcitx
+if [ ! -f ~/.config/fcitx/config ]; then
+    cat > ~/.config/fcitx/config << 'EOL'
+[Hotkey]
+TriggerKey=CTRL_SPACE
+SwitchKey=Disabled
+EOL
+fi
 
-# 下载fonts.tar.gz
-echo -e "${BLUE}正在下载字体文件...${NC}"
-curl -L "https://github.com/JaewooJoung/a/raw/main/1737776534_fonts.tar.gz" -o fonts.tar.gz
-
-# 解压
-echo -e "${BLUE}正在解压字体文件...${NC}"
-tar xzf fonts.tar.gz
-
-# 创建系统字体目录
-sudo mkdir -p /usr/share/fonts/chinese-custom
-
-# 复制字体文件
-echo -e "${BLUE}正在将字体安装到系统中...${NC}"
-sudo cp -r ./*.ttf /usr/share/fonts/chinese-custom/ 2>/dev/null || true
-sudo cp -r ./*.TTF /usr/share/fonts/chinese-custom/ 2>/dev/null || true
-sudo cp -r ./*.otf /usr/share/fonts/chinese-custom/ 2>/dev/null || true
-sudo cp -r ./*.OTF /usr/share/fonts/chinese-custom/ 2>/dev/null || true
-
-# 更新字体缓存
-echo -e "${BLUE}正在更新字体缓存...${NC}"
-sudo fc-cache -f -v
-
-# 清理临时目录
-cd
-rm -rf "$TEMP_DIR"
-
-
+pkill fcitx-configtool 2>/dev/null || true
+fcitx-configtool &
 
 # Virtualbox初始设置
 sudo modprobe vboxdrv
