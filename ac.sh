@@ -151,104 +151,6 @@ sudo pacman -S --needed --noconfirm \
     obs-studio v4l2loopback-dkms virtualbox virtualbox-host-modules-arch \
     nano conky samba net-tools bluez bluez-utils bluedevil 
 
-# 安装fcitx及中文输入法
-echo -e "${BLUE}正在安装fcitx及中文输入法...${NC}"
-# Install fcitx and input methods (if not already installed)
-echo -e "${BLUE}Installing/checking fcitx and input methods...${NC}"
-sudo pacman -S --needed --noconfirm \
-    fcitx \
-    fcitx-im \
-    fcitx-configtool \
-    fcitx-googlepinyin \
-    fcitx-rime \
-    fcitx-gtk2 \
-    fcitx-gtk3 \
-    fcitx-qt5
-
-# Check if fcitx-baidupinyin is installed
-if ! pacman -Qs fcitx-baidupinyin > /dev/null; then
-    echo -e "${BLUE}Installing fcitx-baidupinyin...${NC}"
-    yay -S --noconfirm fcitx-baidupinyin
-fi
-
-# Configure environment variables (append if not exists)
-echo -e "${BLUE}Configuring environment variables...${NC}"
-
-# Function to add environment variables if they don't exist
-add_env_vars() {
-    local file=$1
-    local vars=(
-        "export GTK_IM_MODULE=fcitx"
-        "export QT_IM_MODULE=fcitx"
-        "export XMODIFIERS=@im=fcitx"
-    )
-    
-    for var in "${vars[@]}"; do
-        if ! grep -q "^$var" "$file" 2>/dev/null; then
-            echo "$var" >> "$file"
-        fi
-    done
-}
-
-# Add to various config files
-add_env_vars ~/.xprofile
-add_env_vars ~/.bashrc
-[ -f ~/.xinitrc ] && add_env_vars ~/.xinitrc
-
-# Add fcitx autostart if not exists
-if ! grep -q "fcitx -d" ~/.xprofile; then
-    echo "fcitx -d" >> ~/.xprofile
-fi
-
-# Create xorg config for fcitx if not exists
-if [ ! -f /etc/X11/xorg.conf.d/30-fcitx.conf ]; then
-    echo -e "${BLUE}Creating Xorg configuration for fcitx...${NC}"
-    sudo mkdir -p /etc/X11/xorg.conf.d
-    sudo tee /etc/X11/xorg.conf.d/30-fcitx.conf > /dev/null << 'EOL'
-Section "InputClass"
-    Identifier "Fcitx"
-    MatchIsKeyboard "on"
-    Option "DefaultServerLayout" "fcitx"
-EndSection
-EOL
-fi
-
-# Create autostart entry if not exists
-mkdir -p ~/.config/autostart
-if [ ! -f ~/.config/autostart/fcitx.desktop ]; then
-    cat > ~/.config/autostart/fcitx.desktop << 'EOL'
-[Desktop Entry]
-Name=Fcitx
-Comment=Start Input Method
-Exec=fcitx
-Icon=fcitx
-Terminal=false
-Type=Application
-Categories=System;
-X-GNOME-Autostart-Phase=Applications
-X-GNOME-AutoRestart=false
-X-GNOME-Autostart-Notify=false
-X-KDE-autostart-after=panel
-EOL
-fi
-
-# Restart fcitx
-echo -e "${BLUE}Restarting fcitx...${NC}"
-killall fcitx 2>/dev/null
-fcitx -d
-
-# Set up default configuration if not exists
-mkdir -p ~/.config/fcitx
-if [ ! -f ~/.config/fcitx/config ]; then
-    cat > ~/.config/fcitx/config << 'EOL'
-[Hotkey]
-TriggerKey=CTRL_SPACE
-SwitchKey=Disabled
-EOL
-fi
-
-pkill fcitx-configtool 2>/dev/null || true
-fcitx-configtool &
 
 # Virtualbox初始设置
 sudo modprobe vboxdrv
@@ -257,6 +159,31 @@ sudo usermod -aG vboxusers $USER
 # 启用蓝牙
 sudo systemctl start bluetooth
 sudo systemctl enable bluetooth
+
+# 스크립트 설명
+echo "这个脚本将安装并配置 fcitx 和中文输入法。"
+
+# fcitx 설치
+echo "正在安装 fcitx 及中文输入法..."
+sudo pacman -S fcitx fcitx-chewing fcitx-googlepinyin fcitx-configtool --noconfirm
+
+# 환경 변수 설정
+echo "正在设置环境变量..."
+echo "export GTK_IM_MODULE=fcitx" >> ~/.xprofile
+echo "export QT_IM_MODULE=fcitx" >> ~/.xprofile
+echo "export XMODIFIERS=@im=fcitx" >> ~/.xprofile
+
+# fcitx 자동 시작 설정
+echo "正在配置 fcitx 自动启动..."
+echo "fcitx &" >> ~/.xprofile
+
+# fcitx 실행
+echo "正在启动 fcitx..."
+fcitx &
+
+# 완료 메시지
+echo "设置已完成！重启后即可使用中文输入法。"
+echo "重启命令: sudo reboot"
 
 echo -e "${GREEN}安装完成！${NC}"
 echo -e "${GREEN}请重启系统或注销后重新登录以应用更改。${NC}"
