@@ -93,7 +93,6 @@ if [ -n "$GPU_CONFIG" ]; then
     esac
 fi
 
-
 # 如果未安装Rust，则安装
 if ! command -v rustc &> /dev/null; then
     echo -e "${BLUE}正在安装Rust...${NC}"
@@ -118,9 +117,9 @@ clear
 echo -e "${BLUE}正在安装Julia...${NC}"
 curl -fsSL https://install.julialang.org | sh
 
-# 安装Naver Whale
+# 安装百度网盘
 clear
-echo -e "${BLUE}正在安装baidunetdisk ...${NC}"
+echo -e "${BLUE}正在安装百度网盘...${NC}"
 yay -S baidunetdisk-bin --noconfirm
 
 # 安装WPS Office（中文版）
@@ -128,7 +127,7 @@ clear
 echo -e "${BLUE}正在安装WPS Office...${NC}"
 yay -S wps-office-cn ttf-d2coding --noconfirm
 
-# 安装sublime、visual-studio-code-bin等
+# 安装常用软件
 clear
 echo -e "${BLUE}正在安装常用软件...${NC}"
 yay -S sublime-text-4 visual-studio-code-bin teams teams-for-linux realvnc-vnc-server p3x-onenote-bin unciv-bin snes9x-git freetube github-cli \
@@ -151,6 +150,101 @@ sudo pacman -S --needed --noconfirm \
     obs-studio v4l2loopback-dkms virtualbox virtualbox-host-modules-arch \
     nano conky samba net-tools bluez bluez-utils bluedevil 
 
+# 安装fcitx及中文输入法
+echo -e "${BLUE}正在安装fcitx及中文输入法...${NC}"
+sudo pacman -S --needed --noconfirm \
+    fcitx \
+    fcitx-im \
+    fcitx-configtool \
+    fcitx-googlepinyin \
+    fcitx-rime \
+    fcitx-gtk2 \
+    fcitx-gtk3 \
+    fcitx-qt5
+
+# 检查并安装fcitx-baidupinyin
+if ! pacman -Qs fcitx-baidupinyin > /dev/null; then
+    echo -e "${BLUE}正在安装fcitx-baidupinyin...${NC}"
+    yay -S --noconfirm fcitx-baidupinyin
+fi
+
+# 配置环境变量
+echo -e "${BLUE}正在配置环境变量...${NC}"
+
+add_env_vars() {
+    local file=$1
+    local vars=(
+        "export GTK_IM_MODULE=fcitx"
+        "export QT_IM_MODULE=fcitx"
+        "export XMODIFIERS=@im=fcitx"
+    )
+    
+    for var in "${vars[@]}"; do
+        if ! grep -q "^$var" "$file" 2>/dev/null; then
+            echo "$var" >> "$file"
+        fi
+    done
+}
+
+# 添加到配置文件
+add_env_vars ~/.xprofile
+add_env_vars ~/.bashrc
+[ -f ~/.xinitrc ] && add_env_vars ~/.xinitrc
+
+# 添加fcitx自动启动
+if ! grep -q "fcitx -d" ~/.xprofile; then
+    echo "fcitx -d" >> ~/.xprofile
+fi
+
+# 创建Xorg配置
+if [ ! -f /etc/X11/xorg.conf.d/30-fcitx.conf ]; then
+    echo -e "${BLUE}正在创建Xorg配置...${NC}"
+    sudo mkdir -p /etc/X11/xorg.conf.d
+    sudo tee /etc/X11/xorg.conf.d/30-fcitx.conf > /dev/null << 'EOL'
+Section "InputClass"
+    Identifier "Fcitx"
+    MatchIsKeyboard "on"
+    Option "DefaultServerLayout" "fcitx"
+EndSection
+EOL
+fi
+
+# 创建自动启动项
+mkdir -p ~/.config/autostart
+if [ ! -f ~/.config/autostart/fcitx.desktop ]; then
+    cat > ~/.config/autostart/fcitx.desktop << 'EOL'
+[Desktop Entry]
+Name=Fcitx
+Comment=Start Input Method
+Exec=fcitx
+Icon=fcitx
+Terminal=false
+Type=Application
+Categories=System;
+X-GNOME-Autostart-Phase=Applications
+X-GNOME-AutoRestart=false
+X-GNOME-Autostart-Notify=false
+X-KDE-autostart-after=panel
+EOL
+fi
+
+# 重启fcitx
+echo -e "${BLUE}正在重启fcitx...${NC}"
+killall fcitx 2>/dev/null
+fcitx -d
+
+# 设置默认配置
+mkdir -p ~/.config/fcitx
+if [ ! -f ~/.config/fcitx/config ]; then
+    cat > ~/.config/fcitx/config << 'EOL'
+[Hotkey]
+TriggerKey=CTRL_SPACE
+SwitchKey=Disabled
+EOL
+fi
+
+pkill fcitx-configtool 2>/dev/null || true
+fcitx-configtool &
 
 # Virtualbox初始设置
 sudo modprobe vboxdrv
@@ -159,31 +253,6 @@ sudo usermod -aG vboxusers $USER
 # 启用蓝牙
 sudo systemctl start bluetooth
 sudo systemctl enable bluetooth
-
-# 스크립트 설명
-echo "这个脚本将安装并配置 fcitx 和中文输入法。"
-
-# fcitx 설치
-echo "正在安装 fcitx 及中文输入法..."
-sudo pacman -S fcitx fcitx-chewing fcitx-googlepinyin fcitx-configtool --noconfirm
-
-# 환경 변수 설정
-echo "正在设置环境变量..."
-echo "export GTK_IM_MODULE=fcitx" >> ~/.xprofile
-echo "export QT_IM_MODULE=fcitx" >> ~/.xprofile
-echo "export XMODIFIERS=@im=fcitx" >> ~/.xprofile
-
-# fcitx 자동 시작 설정
-echo "正在配置 fcitx 自动启动..."
-echo "fcitx &" >> ~/.xprofile
-
-# fcitx 실행
-echo "正在启动 fcitx..."
-fcitx &
-
-# 완료 메시지
-echo "设置已完成！重启后即可使用中文输入法。"
-echo "重启命令: sudo reboot"
 
 echo -e "${GREEN}安装完成！${NC}"
 echo -e "${GREEN}请重启系统或注销后重新登录以应用更改。${NC}"
