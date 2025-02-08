@@ -150,22 +150,21 @@ sudo pacman -S --needed --noconfirm \
     obs-studio v4l2loopback-dkms virtualbox virtualbox-host-modules-arch \
     nano conky samba net-tools bluez bluez-utils bluedevil 
 
-# 安装fcitx及中文输入法
-echo -e "${BLUE}正在安装fcitx及中文输入法...${NC}"
+# 安装Fcitx 5及中文输入法
+echo -e "${BLUE}正在安装Fcitx 5及中文输入法...${NC}"
 sudo pacman -S --needed --noconfirm \
-    fcitx \
-    fcitx-im \
-    fcitx-configtool \
-    fcitx-googlepinyin \
-    fcitx-rime \
-    fcitx-gtk2 \
-    fcitx-gtk3 \
-    fcitx-qt5
+    fcitx5 \
+    fcitx5-configtool \
+    fcitx5-gtk \
+    fcitx5-qt \
+    fcitx5-chinese-addons \
+    fcitx5-pinyin-zhwiki \
+    fcitx5-rime
 
-# 检查并安装fcitx-baidupinyin
-if ! pacman -Qs fcitx-baidupinyin > /dev/null; then
-    echo -e "${BLUE}正在安装fcitx-baidupinyin...${NC}"
-    yay -S --noconfirm fcitx-baidupinyin
+# 检查并安装fcitx5-baidupinyin（如果可用）
+if ! pacman -Qs fcitx5-baidupinyin > /dev/null; then
+    echo -e "${BLUE}正在安装fcitx5-baidupinyin...${NC}"
+    yay -S --noconfirm fcitx5-baidupinyin
 fi
 
 # 配置环境变量
@@ -174,9 +173,9 @@ echo -e "${BLUE}正在配置环境变量...${NC}"
 add_env_vars() {
     local file=$1
     local vars=(
-        "export GTK_IM_MODULE=fcitx"
-        "export QT_IM_MODULE=fcitx"
-        "export XMODIFIERS=@im=fcitx"
+        "export GTK_IM_MODULE=fcitx5"
+        "export QT_IM_MODULE=fcitx5"
+        "export XMODIFIERS=@im=fcitx5"
     )
     
     for var in "${vars[@]}"; do
@@ -191,33 +190,33 @@ add_env_vars ~/.xprofile
 add_env_vars ~/.bashrc
 [ -f ~/.xinitrc ] && add_env_vars ~/.xinitrc
 
-# 添加fcitx自动启动
-if ! grep -q "fcitx -d" ~/.xprofile; then
-    echo "fcitx -d" >> ~/.xprofile
+# 添加Fcitx 5自动启动
+if ! grep -q "fcitx5 -d" ~/.xprofile; then
+    echo "fcitx5 -d" >> ~/.xprofile
 fi
 
 # 创建Xorg配置
-if [ ! -f /etc/X11/xorg.conf.d/30-fcitx.conf ]; then
+if [ ! -f /etc/X11/xorg.conf.d/30-fcitx5.conf ]; then
     echo -e "${BLUE}正在创建Xorg配置...${NC}"
     sudo mkdir -p /etc/X11/xorg.conf.d
-    sudo tee /etc/X11/xorg.conf.d/30-fcitx.conf > /dev/null << 'EOL'
+    sudo tee /etc/X11/xorg.conf.d/30-fcitx5.conf > /dev/null << 'EOL'
 Section "InputClass"
-    Identifier "Fcitx"
+    Identifier "Fcitx5"
     MatchIsKeyboard "on"
-    Option "DefaultServerLayout" "fcitx"
+    Option "DefaultServerLayout" "fcitx5"
 EndSection
 EOL
 fi
 
 # 创建自动启动项
 mkdir -p ~/.config/autostart
-if [ ! -f ~/.config/autostart/fcitx.desktop ]; then
-    cat > ~/.config/autostart/fcitx.desktop << 'EOL'
+if [ ! -f ~/.config/autostart/fcitx5.desktop ]; then
+    cat > ~/.config/autostart/fcitx5.desktop << 'EOL'
 [Desktop Entry]
-Name=Fcitx
+Name=Fcitx5
 Comment=Start Input Method
-Exec=fcitx
-Icon=fcitx
+Exec=fcitx5
+Icon=fcitx5
 Terminal=false
 Type=Application
 Categories=System;
@@ -228,23 +227,23 @@ X-KDE-autostart-after=panel
 EOL
 fi
 
-# 重启fcitx
-echo -e "${BLUE}正在重启fcitx...${NC}"
-killall fcitx 2>/dev/null
-fcitx -d
+# 重启Fcitx 5
+echo -e "${BLUE}正在重启Fcitx 5...${NC}"
+killall fcitx5 2>/dev/null
+fcitx5 -d
 
 # 设置默认配置
-mkdir -p ~/.config/fcitx
-if [ ! -f ~/.config/fcitx/config ]; then
-    cat > ~/.config/fcitx/config << 'EOL'
+mkdir -p ~/.config/fcitx5
+if [ ! -f ~/.config/fcitx5/config ]; then
+    cat > ~/.config/fcitx5/config << 'EOL'
 [Hotkey]
 TriggerKey=CTRL_SPACE
 SwitchKey=Disabled
 EOL
 fi
 
-pkill fcitx-configtool 2>/dev/null || true
-fcitx-configtool &
+pkill fcitx5-configtool 2>/dev/null || true
+fcitx5-configtool &
 
 # Virtualbox初始设置
 sudo modprobe vboxdrv
@@ -257,4 +256,4 @@ sudo systemctl enable bluetooth
 echo -e "${GREEN}安装完成！${NC}"
 echo -e "${GREEN}请重启系统或注销后重新登录以应用更改。${NC}"
 echo -e "${GREEN}请重启终端或执行 'source ~/.bashrc' 以使用Julia。${NC}"
-echo -e "${GREEN}可以使用fcitx进行中文输入。${NC}"
+echo -e "${GREEN}可以使用Fcitx 5进行中文输入。${NC}"
