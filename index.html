@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stock Analysis Report: VOLV-B.ST</title>
+    <style>
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        line-height: 1.6;
+        color: #333;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+        background-color: #f9f9f9;
+    }
+    h1, h2, h3 {
+        color: #2c3e50;
+    }
+    h1 {
+        border-bottom: 2px solid #3498db;
+        padding-bottom: 10px;
+    }
+    .container {
+        background-color: white;
+        padding: 25px;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        margin-bottom: 30px;
+    }
+    .summary {
+        background-color: #f8f9fa;
+        padding: 15px;
+        border-left: 4px solid #3498db;
+        margin-bottom: 20px;
+        font-family: monospace;
+        white-space: pre-wrap;
+    }
+    .chart {
+        max-width: 100%;
+        height: auto;
+        margin: 20px 0;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+    }
+    .buy {
+        color: #27ae60;
+        font-weight: bold;
+    }
+    .sell {
+        color: #e74c3c;
+        font-weight: bold;
+    }
+    .neutral {
+        color: #f39c12;
+        font-weight: bold;
+    }
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 20px 0;
+    }
+    th, td {
+        padding: 12px 15px;
+        text-align: left;
+        border-bottom: 1px solid #ddd;
+    }
+    th {
+        background-color: #f2f2f2;
+        font-weight: bold;
+    }
+    tr:hover {
+        background-color: #f5f5f5;
+    }
+    .footer {
+        text-align: center;
+        margin-top: 50px;
+        font-size: 0.9em;
+        color: #7f8c8d;
+    }
+    .metrics {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 15px;
+        margin: 20px 0;
+    }
+    .metric-card {
+        background: white;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 15px;
+        flex: 1;
+        min-width: 200px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+    .metric-title {
+        font-size: 0.9em;
+        color: #7f8c8d;
+        margin-bottom: 5px;
+    }
+    .metric-value {
+        font-size: 1.8em;
+        font-weight: bold;
+        color: #2c3e50;
+    }
+    .chart-container {
+        margin-bottom: 40px;
+    }
+    .chart-title {
+        font-size: 1.2em;
+        font-weight: bold;
+        margin-bottom: 10px;
+        color: #2c3e50;
+    }
+    .chart-description {
+        margin-top: 10px;
+        font-size: 0.9em;
+        color: #7f8c8d;
+    }
+</style>
+
+</head>
+<body>
+    <h1>Stock Analysis Report: VOLV-B.ST</h1>
+    <p>Report generated on 2025-05-11 14:46:03</p>
+    
+    <div class="container">
+        <h2>Current Strategy: <span class="buy">BULLISH</span></h2>
+        
+        <div class="metrics">
+            <div class="metric-card">
+                <div class="metric-title">Current Price</div>
+                <div class="metric-value">264.6</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-title">RSI(14)</div>
+                <div class="metric-value">48.13</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-title">MACD</div>
+                <div class="metric-value">-4.8883</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-title">P/E Ratio</div>
+                <div class="metric-value">10.57</div>
+            </div>
+        </div>
+        
+        <div class="summary">Stock Analysis Summary for VOLV-B.ST
+Period: 3mo
+Date Range: 2025-02-11T08:00:00 to 2025-05-09T07:00:00
+
+Latest Price: 264.6
+RSI(14): 48.13
+MACD: -4.8883, Signal: -7.9533
+
+Recent Signals (Last 30 days):
+Buy Signals: 11
+Sell Signals: 1
+
+Strategy: BULLISH
+</div>
+        
+        <h3>Signals (Last 30 Days)</h3>
+        <table>
+            <tr>
+                <th>Signal Type</th>
+                <th>Count</th>
+            </tr>
+            <tr>
+                <td>Buy Signals</td>
+                <td>11</td>
+            </tr>
+            <tr>
+                <td>Sell Signals</td>
+                <td>1</td>
+            </tr>
+        </table>
+    </div>
+    
+    <!-- Combined Analysis Chart -->
+    <div class="container">
+        <h2>Combined Technical Analysis</h2>
+        <img class="chart" src="plots/VOLV-B.ST_combined_20250511.png" alt="Combined Technical Analysis Chart">
+    </div>
+    
+    <!-- Price Chart with Buy/Sell Signals -->
+    <div class="container">
+        <h2>Price Movement and Signals</h2>
+        <div class="chart-container">
+            <div class="chart-title">Price Chart with Buy/Sell Signals</div>
+            <img class="chart" src="plots/VOLV-B.ST_price_20250511.png" alt="Price Chart with Buy/Sell Signals">
+            <div class="chart-description">
+                The price chart shows the stock's price movement over time with buy signals (green circles) and 
+                sell signals (red crosses). Moving averages help identify the overall trend.
+            </div>
+        </div>
+    </div>
+    
+    <!-- Technical Indicators -->
+    <div class="container">
+        <h2>Technical Indicators</h2>
+        
+        <!-- RSI Chart -->
+        <div class="chart-container">
+            <div class="chart-title">Relative Strength Index (RSI)</div>
+            <img class="chart" src="plots/VOLV-B.ST_rsi_20250511.png" alt="RSI Chart">
+            <div class="chart-description">
+                RSI measures the speed and change of price movements. Values above 70 indicate overbought conditions
+                (potential sell signal), while values below 30 indicate oversold conditions (potential buy signal).
+            </div>
+        </div>
+        
+        <!-- MACD Chart -->
+        <div class="chart-container">
+            <div class="chart-title">Moving Average Convergence Divergence (MACD)</div>
+            <img class="chart" src="plots/VOLV-B.ST_macd_20250511.png" alt="MACD Chart">
+            <div class="chart-description">
+                MACD shows the relationship between two moving averages of a security's price. 
+                The MACD line crossing above the signal line is bullish, while crossing below is bearish.
+                The histogram shows the difference between MACD and signal line.
+            </div>
+        </div>
+        
+        <!-- Bollinger Bands Chart -->
+        <div class="chart-container">
+            <div class="chart-title">Bollinger Bands</div>
+            <img class="chart" src="plots/VOLV-B.ST_bb_20250511.png" alt="Bollinger Bands Chart">
+            <div class="chart-description">
+                Bollinger Bands consist of a middle band (20-day SMA) with an upper and lower band.
+                Price reaching the upper band may indicate overbought conditions, while reaching the lower band may indicate
+                oversold conditions. The width of the bands indicates volatility.
+            </div>
+        </div>
+    </div>
+    
+    <!-- Advanced Technical Analysis -->
+    <div class="container">
+        <h2>Advanced Technical Analysis</h2>
+        
+        <!-- Fibonacci Retracement Chart -->
+        <div class="chart-container">
+            <div class="chart-title">Fibonacci Retracement</div>
+            <img class="chart" src="plots/VOLV-B.ST_fibonacci_20250511.png" alt="Fibonacci Retracement Chart">
+            <div class="chart-description">
+                Fibonacci retracement levels (23.6%, 38.2%, 50%, 61.8%, etc.) are horizontal lines that indicate where 
+                support and resistance are likely to occur based on Fibonacci numbers. These are important levels
+                where price might reverse direction.
+            </div>
+        </div>
+        
+        <!-- All-Time Highs Chart -->
+        <div class="chart-container">
+            <div class="chart-title">All-Time Highs Analysis</div>
+            <img class="chart" src="plots/VOLV-B.ST_ath_20250511.png" alt="All-Time Highs Chart">
+            <div class="chart-description">
+                This chart marks points where the price reached all-time highs within a specified lookback window.
+                All-time high points often act as psychological resistance levels and may signal potential trend 
+                strength or market euphoria.
+            </div>
+        </div>
+        
+        <!-- Golden/Death Cross Chart -->
+        <div class="chart-container">
+            <div class="chart-title">Moving Average Crosses (Golden Cross & Death Cross)</div>
+            <img class="chart" src="plots/VOLV-B.ST_crosses_20250511.png" alt="Moving Average Crosses Chart">
+            <div class="chart-description">
+                A Golden Cross occurs when a shorter-term moving average crosses above a longer-term moving average,
+                typically the 50-day MA crossing above the 200-day MA, indicating a potential bullish trend.
+                A Death Cross is the opposite, potentially signaling a bearish trend.
+            </div>
+        </div>
+        
+        <!-- Volume Analysis Chart -->
+        <div class="chart-container">
+            <div class="chart-title">Volume Analysis</div>
+            <img class="chart" src="plots/VOLV-B.ST_volume_20250511.png" alt="Volume Analysis Chart">
+            <div class="chart-description">
+                Volume analysis examines the number of shares traded over time. High volume often confirms price movements,
+                while price changes on low volume may be less reliable. Volume spikes can indicate potential reversal
+                points or trend confirmations.
+            </div>
+        </div>
+    </div>
+    
+    <div class="container">
+        <h2>Recent Signal Dates</h2>
+        
+        <h3>Buy Signals</h3>
+        <div class="buy">
+            2025-04-28T07:00:00<br>2025-04-17T07:00:00<br>2025-04-11T07:00:00<br>2025-04-10T07:00:00<br>2025-04-09T07:00:00
+        </div>
+        
+        <h3>Sell Signals</h3>
+        <div class="sell">
+            2025-05-09T07:00:00
+        </div>
+    </div>
+    
+    <div class="footer">
+        <p>Generated with Jaewoo's Financial Analysis Tools | 2025-05-11</p>
+    </div>
+</body>
+</html>
